@@ -1,0 +1,14 @@
+{
+  "name": "amberbrooch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:MichinobuMaeda/amberbrooch.git",
+  "author": "Michinobu Maeda <michinobumaeda@gmail.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "serve": "firebase emulators:exec --only auth,functions,firestore,storage 'flutter run'"
+  },
+  "devDependencies": {
+    "firebase-tools": "^9.18.0"
+  }
+}

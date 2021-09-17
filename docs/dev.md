@@ -14,4 +14,6 @@ $ flutter pub get
 $ cd functions
 $ yarn install
 $  cd ..
+$ yarn install
+$ yarn serve
 ```
