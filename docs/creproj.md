@@ -94,5 +94,16 @@ https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
 i  Action required: Push any new workflow file(s) to your repo
 
 $ mv build/web/404.html web/
-$ rm build/web/index.html 
+$ rm build/web/index.html
+
+$ firebase login:ci
+
+1//...
+
 ```
+
+https://github.com/MichinobuMaeda/amberbrooch
+
+- Settings
+    - Secrets
+        - FIREBASE_TOKEN_AMBERBROOCH: 1//...

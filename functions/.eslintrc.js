@@ -19,6 +19,8 @@ module.exports = {
   },
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
+    "/jest.config.js",
+    "/coverage/**/*",
   ],
   plugins: [
     "@typescript-eslint",
@@ -26,6 +28,7 @@ module.exports = {
   ],
   rules: {
     "quotes": ["error", "double"],
+    "spaced-comment": ["error", "always", {"markers": ["/"]}],
     "import/no-unresolved": 0,
   },
 };

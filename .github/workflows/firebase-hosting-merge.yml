@@ -34,13 +34,14 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
 
       - run: yarn --cwd functions install --frozen-lockfile && yarn --cwd functions lint && yarn --cwd functions build
+      - run: yarn test:functions
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
       - run: rm web/index.html && mv web/index_prod.html web/index.html
       - run: flutter pub get
       - run: flutter build web
-      - run: yarn deploy --only storage,firestore,functions
+      - run: yarn deploy --only storage,firestore,functions --token "${{ secrets.FIREBASE_TOKEN }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
