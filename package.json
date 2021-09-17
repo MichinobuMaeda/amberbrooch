@@ -6,7 +6,7 @@
   "author": "Michinobu Maeda <michinobumaeda@gmail.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "serve": "firebase emulators:exec --only auth,functions,firestore,storage 'flutter run'"
+    "serve": "firebase emulators:exec --only auth,functions,firestore,storage 'flutter run --dart-define=EMULATOR=Y'"
   },
   "devDependencies": {
     "firebase-tools": "^9.18.0"
