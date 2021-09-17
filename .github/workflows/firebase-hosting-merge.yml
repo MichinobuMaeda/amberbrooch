@@ -37,8 +37,10 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
+      - run: rm web/index.html && mv web/index_prod.html web/index.html
       - run: flutter pub get
       - run: flutter build web
+      - run: yarn deploy --only storage,firestore,functions
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
