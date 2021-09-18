@@ -5,6 +5,7 @@
 - Flutter >= 2.5.0
 - Node.js >= 14
 - [Firebase Local Emulator Suite](https://firebase.google.com/docs/emulator-suite)
+- curl
 
 ```
 $ npm -g install yarn firebase-tools eslint jest

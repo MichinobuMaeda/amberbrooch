@@ -1,20 +1,18 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-
-const useEmulator = String.fromEnvironment('EMULATOR');
-const String functionRegion = 'asia-northeast1';
-final FirebaseAuth auth = FirebaseAuth.instance;
-final FirebaseFirestore db = FirebaseFirestore.instance;
-final FirebaseStorage storage = FirebaseStorage.instance;
-final FirebaseFunctions functions =
-    FirebaseFunctions.instanceFor(region: functionRegion);
+import 'conf.dart';
+import 'models.dart';
+import 'widgets.dart';
 
 void main() {
-  runApp(const App());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => FirebaseModel()),
+      ChangeNotifierProvider(create: (context) => ConfModel()),
+      ChangeNotifierProvider(create: (context) => AuthModel(auth)),
+    ],
+    child: const App(),
+  ));
 }
 
 class App extends StatelessWidget {
@@ -24,11 +22,11 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: appTitle,
+      theme: theme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.light,
+      home: const MyHomePage(title: appTitle),
     );
   }
 }
@@ -42,31 +40,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _firebaseInitialized = false;
-  bool _firebaseError = false;
-
-  void initializeFlutterFire() async {
-    try {
-      if (useEmulator == 'Y') {
-        await auth.useAuthEmulator('localhost', 9099);
-        db.useFirestoreEmulator('localhost', 8080);
-        await storage.useStorageEmulator('localhost', 9199);
-        functions.useFunctionsEmulator('localhost', 5001);
-      }
-      await Firebase.initializeApp();
-      setState(() {
-        _firebaseInitialized = true;
-      });
-    } catch (e) {
-      setState(() {
-        _firebaseError = true;
-      });
-    }
-  }
-
   @override
   void initState() {
-    initializeFlutterFire();
+    Provider.of<FirebaseModel>(context, listen: false).init();
     super.initState();
   }
 
@@ -77,21 +53,82 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              useEmulator == 'Y' ? 'Use emulator' : 'Production mode',
-            ),
-            Text(
-              _firebaseInitialized
-                  ? 'Firebase initialized'
-                  : _firebaseError
-                      ? 'Firebase error'
-                      : 'Firebase initialzing',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        child: Consumer<FirebaseModel>(
+          builder: (context, firebase, child) {
+            if (!firebase.initialized) {
+              if (!firebase.error) {
+                return const LoadingStatus(
+                  message: '接続の準備をしています。',
+                );
+              } else {
+                return LoadingStatus(
+                  message: '接続の設定のエラーです。',
+                  color: Theme.of(context).errorColor,
+                  subsequents: const <Widget>[
+                    Text('管理者に連絡してください。'),
+                  ],
+                );
+              }
+            } else {
+              Provider.of<AuthModel>(context, listen: false).listen();
+              Provider.of<ConfModel>(context, listen: false).listen();
+              return Consumer<ConfModel>(
+                builder: (context, confModel, child) {
+                  Conf? conf = confModel.getConf();
+                  if (!confModel.initialized) {
+                    return const LoadingStatus(
+                      message: 'サービスの設定を取得しています。',
+                    );
+                  } else if (conf == null) {
+                    return LoadingStatus(
+                      message: 'サービスの設定が取得できませんでした。',
+                      color: Theme.of(context).errorColor,
+                      subsequents: const <Widget>[
+                        Text('管理者に連絡してください。'),
+                      ],
+                    );
+                  } else {
+                    return Consumer<AuthModel>(
+                      builder: (context, authModel, child) {
+                        AuthUser? authUser = authModel.getUser();
+                        if (authUser == null) {
+                          return LoadingStatus(
+                            message: 'ログインしてください。',
+                            color: Theme.of(context).errorColor,
+                            subsequents: useEmulator
+                                ? [
+                                    TextButton(
+                                      child: const Text('Test'),
+                                      onPressed: () =>
+                                          auth.signInWithEmailAndPassword(
+                                        email: testEmail,
+                                        password: testPassword,
+                                      ),
+                                    ),
+                                  ]
+                                : [],
+                          );
+                        } else {
+                          return LoadingStatus(
+                            message: 'ログインしました。',
+                            subsequents: <Widget>[Text(authUser.id)] +
+                                (useEmulator
+                                    ? [
+                                        TextButton(
+                                          child: const Text('Test'),
+                                          onPressed: () => auth.signOut(),
+                                        ),
+                                      ]
+                                    : []),
+                          );
+                        }
+                      },
+                    );
+                  }
+                },
+              );
+            }
+          },
         ),
       ),
     );
