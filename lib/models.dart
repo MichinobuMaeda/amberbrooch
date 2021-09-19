@@ -147,18 +147,18 @@ class AuthModel extends ChangeNotifier {
   void listen() {
     debugPrint('auth: listen()');
     _auth.authStateChanges().listen((User? user) {
-      _receiveUser(user);
+      _updateUser(user);
     });
   }
 
   Future<void> reload() async {
     if (auth.currentUser != null) {
       await auth.currentUser!.reload();
-      _receiveUser(auth.currentUser);
+      _updateUser(auth.currentUser);
     }
   }
 
-  void _receiveUser(User? user) {
+  void _updateUser(User? user) {
     if (user == null) {
       if (_user != null) {
         _user = null;
