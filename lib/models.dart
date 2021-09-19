@@ -50,20 +50,37 @@ class FirebaseModel extends ChangeNotifier {
 }
 
 class Conf {
-  final String _url;
-  final String _version;
-  final String _buildNumber;
-  final DateTime _createdAt;
-  final DateTime _updatedAt;
+  final String url;
+  final String version;
+  final String buildNumber;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  Conf(this._url, this._version, this._buildNumber, this._createdAt,
-      this._updatedAt);
+  Conf({
+    required this.url,
+    required this.version,
+    required this.buildNumber,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
-  String get url => _url;
-  String get version => _version;
-  String get buildNumber => _buildNumber;
-  DateTime get createdAt => _createdAt;
-  DateTime get updatedAt => _updatedAt;
+  @override
+  operator ==(Object other) =>
+      other is Conf &&
+      other.url == url &&
+      other.version == version &&
+      other.buildNumber == buildNumber &&
+      other.createdAt == createdAt &&
+      other.updatedAt == updatedAt;
+
+  @override
+  int get hashCode => hashValues(
+        url,
+        version,
+        buildNumber,
+        createdAt,
+        updatedAt,
+      );
 }
 
 class ConfModel extends ChangeNotifier {
@@ -74,21 +91,27 @@ class ConfModel extends ChangeNotifier {
     debugPrint('conf: listen()');
     db.collection('service').doc('conf').snapshots().listen(
       (doc) {
+        _initialized = true;
         if (doc.exists) {
           debugPrint('conf: exists');
-          _conf = Conf(
-            doc.get('url'),
-            doc.get('version'),
-            doc.get('buildNumber'),
-            doc.get('createdAt').toDate(),
-            doc.get('updatedAt').toDate(),
+          Conf provided = Conf(
+            url: doc.get('url'),
+            version: doc.get('version'),
+            buildNumber: doc.get('buildNumber'),
+            createdAt: doc.get('createdAt').toDate(),
+            updatedAt: doc.get('updatedAt').toDate(),
           );
+          if (_conf != provided) {
+            _conf = provided;
+            notifyListeners();
+          }
         } else {
           debugPrint('conf: null');
-          _conf = null;
+          if (_conf != null) {
+            _conf = null;
+            notifyListeners();
+          }
         }
-        _initialized = true;
-        notifyListeners();
       },
     );
   }
@@ -98,13 +121,21 @@ class ConfModel extends ChangeNotifier {
 }
 
 class AuthUser {
-  final String _id;
+  final String id;
   String? email;
-  bool emailVerified = false;
+  bool? emailVerified = false;
 
-  AuthUser(this._id, this.email, this.emailVerified);
+  AuthUser({required this.id, this.email, this.emailVerified});
 
-  String get id => _id;
+  @override
+  operator ==(Object other) =>
+      other is AuthUser &&
+      other.id == id &&
+      other.email == email &&
+      other.emailVerified == emailVerified;
+
+  @override
+  int get hashCode => hashValues(id, email, emailVerified);
 }
 
 class AuthModel extends ChangeNotifier {
@@ -116,16 +147,48 @@ class AuthModel extends ChangeNotifier {
   void listen() {
     debugPrint('auth: listen()');
     _auth.authStateChanges().listen((User? user) {
-      if (user == null) {
-        _user = null;
-        debugPrint('auth: null');
-      } else {
-        _user = AuthUser(user.uid, user.email, user.emailVerified);
-        debugPrint('auth: ' + _user!.id);
-      }
-      notifyListeners();
+      _receiveUser(user);
     });
   }
 
+  Future<void> reload() async {
+    if (auth.currentUser != null) {
+      await auth.currentUser!.reload();
+      _receiveUser(auth.currentUser);
+    }
+  }
+
+  void _receiveUser(User? user) {
+    if (user == null) {
+      if (_user != null) {
+        _user = null;
+        debugPrint('auth: null');
+        notifyListeners();
+      }
+    } else {
+      AuthUser provided = AuthUser(
+        id: user.uid,
+        email: user.email,
+        emailVerified: user.emailVerified,
+      );
+      if (_user != provided) {
+        _user = provided;
+        debugPrint('auth: ' + _user!.id);
+        notifyListeners();
+      }
+    }
+  }
+
   AuthUser? getUser() => _user;
+}
+
+class ThemeModeModel extends ChangeNotifier {
+  ThemeMode _mode = defaultThemeMode;
+
+  set mode(ThemeMode mode) {
+    _mode = mode;
+    notifyListeners();
+  }
+
+  ThemeMode get mode => _mode;
 }

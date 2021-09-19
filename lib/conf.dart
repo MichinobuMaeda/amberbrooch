@@ -23,3 +23,5 @@ ThemeData darkTheme = ThemeData(
   primarySwatch: Colors.brown,
   fontFamily: 'NotoSansJP',
 );
+
+ThemeMode defaultThemeMode = ThemeMode.light;
