@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
+import '../conf.dart';
 import '../widgets.dart';
 import '../router.dart';
 import 'base.dart';
@@ -16,36 +16,21 @@ class TopScreen extends BaseScreen {
 
 class _TopState extends BaseState {
   @override
-  Widget buildBody(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const PageTitle(
-          iconData: Icons.home,
-          title: 'トップ',
+  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+    return ContentBody([
+      const PageTitle(
+        iconData: Icons.home,
+        title: appTitle,
+      ),
+      FlexRow([
+        PrimaryButton(
+          iconData: Icons.settings,
+          label: 'アプリの情報と設定',
+          onPressed: () {
+            widget.pushRoute(AppRoutePath.preferences());
+          },
         ),
-        gutter,
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: [
-            PrimaryButton(
-              iconData: Icons.settings,
-              label: '設定',
-              onPressed: () {
-                widget.pushRoute(AppRoutePath.preferences());
-              },
-            ),
-            PrimaryButton(
-              iconData: Icons.policy,
-              label: 'プライバシー・ポリシー',
-              onPressed: () {
-                widget.pushRoute(AppRoutePath.policy());
-              },
-            ),
-          ],
-        ),
-      ],
-    );
+      ]),
+    ]);
   }
 }

@@ -139,18 +139,25 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
                               ? SignInScreen(pushRoute: _handlePush)
                               : LoadingScreen(pushRoute: _handlePush))),
                 ),
+                if (_name == AppRoutePath.preferences().name ||
+                    _name == AppRoutePath.policy().name)
+                  PreferencesPage(pushRoute: _handlePush),
                 if (_name == AppRoutePath.policy().name)
                   PolicyPage(pushRoute: _handlePush)
-                else if (_name == AppRoutePath.preferences().name)
-                  PreferencesPage(pushRoute: _handlePush)
               ],
               onPopPage: (route, result) {
                 if (!route.didPop(result)) {
                   return false;
                 }
 
-                _name = AppRoutePath.top().name;
-                _id = null;
+                if (_name == AppRoutePath.policy().name) {
+                  _name = AppRoutePath.preferences().name;
+                  _id = null;
+                } else {
+                  _name = AppRoutePath.top().name;
+                  _id = null;
+                }
+
                 notifyListeners();
 
                 return true;

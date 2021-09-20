@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import "package:universal_html/html.dart";
+import 'package:package_info_plus/package_info_plus.dart';
 import 'conf.dart';
 
 const bool useEmulator = String.fromEnvironment('EMULATOR') == 'Y';
@@ -13,41 +15,6 @@ final FirebaseFirestore db = FirebaseFirestore.instance;
 final FirebaseStorage storage = FirebaseStorage.instance;
 final FirebaseFunctions functions =
     FirebaseFunctions.instanceFor(region: functionsRegion);
-
-class FirebaseModel extends ChangeNotifier {
-  bool _initialized = false;
-  bool _error = false;
-
-  void init() async {
-    debugPrint('firebase: init()');
-    try {
-      if (useEmulator) {
-        await auth.useAuthEmulator('localhost', emulatorPortAuth);
-        db.useFirestoreEmulator('localhost', emulatorPortFirestore);
-        await storage.useStorageEmulator('localhost', emulatorPortStorage);
-        functions.useFunctionsEmulator('localhost', emulatorPortFunctions);
-      }
-      await Firebase.initializeApp();
-      _initialized = true;
-      debugPrint('firebase: initialized');
-      notifyListeners();
-    } catch (e, s) {
-      if (e.toString().contains('code=failed-precondition')) {
-        _initialized = true;
-        debugPrint('firebase: already initialized');
-      } else {
-        _error = true;
-        debugPrint('firebase: error');
-        debugPrint('Exception: $e');
-        debugPrint('StackTrace: $s');
-      }
-      notifyListeners();
-    }
-  }
-
-  bool get initialized => _initialized;
-  bool get error => _error;
-}
 
 class Conf {
   final String url;
@@ -180,6 +147,76 @@ class AuthModel extends ChangeNotifier {
   }
 
   AuthUser? getUser() => _user;
+}
+
+class FirebaseModel extends ChangeNotifier {
+  bool _initialized = false;
+  bool _error = false;
+
+  FirebaseModel();
+
+  void init({required String deepLink}) async {
+    debugPrint('firebase: init()');
+    try {
+      if (useEmulator) {
+        await auth.useAuthEmulator('localhost', emulatorPortAuth);
+        db.useFirestoreEmulator('localhost', emulatorPortFirestore);
+        await storage.useStorageEmulator('localhost', emulatorPortStorage);
+        functions.useFunctionsEmulator('localhost', emulatorPortFunctions);
+      }
+      await Firebase.initializeApp();
+      auth.setLanguageCode('ja');
+      _initialized = true;
+      debugPrint('firebase: initialized');
+
+      String? email = window.localStorage['amberbrooch_email'];
+      window.localStorage['amberbrooch_email'] = '';
+
+      debugPrint(deepLink);
+      debugPrint(email);
+      if (auth.isSignInWithEmailLink(deepLink)) {
+        if (RegExp(r'reauthenticate=yes').hasMatch(deepLink)) {
+          // AuthCredential credential = EmailAuthProvider.credentialWithLink(
+          //     email: email ?? '', emailLink: deepLink);
+          // _tempCredential = await auth.currentUser
+          //     ?.reauthenticateWithCredential(credential);
+          // appContents = AppContents.me;
+        } else {
+          await auth.signInWithEmailLink(
+            email: email ?? '',
+            emailLink: deepLink,
+          );
+        }
+      }
+
+      notifyListeners();
+    } catch (e, s) {
+      if (e.toString().contains('code=failed-precondition')) {
+        _initialized = true;
+        debugPrint('firebase: already initialized');
+      } else {
+        _error = true;
+        debugPrint('firebase: error');
+        debugPrint('Exception: $e');
+        debugPrint('StackTrace: $s');
+      }
+      notifyListeners();
+    }
+  }
+
+  bool get initialized => _initialized;
+  bool get error => _error;
+}
+
+class ClientModel extends ChangeNotifier {
+  final String deepLink;
+  late PackageInfo packageInfo;
+
+  ClientModel({required this.deepLink});
+
+  void init() async {
+    packageInfo = await PackageInfo.fromPlatform();
+  }
 }
 
 class ThemeModeModel extends ChangeNotifier {

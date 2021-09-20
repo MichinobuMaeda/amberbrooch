@@ -35,57 +35,71 @@ class PreferencesScreen extends BaseScreen {
 
 class _PreferencesState extends BaseState {
   @override
-  Widget buildBody(BuildContext context) {
+  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+    ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
     ThemeModeModel themeModeModel = Provider.of<ThemeModeModel>(context);
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
     AuthUser? authUser = authModel.getUser();
+    List<ThemeMode> themeModes = [
+      ThemeMode.light,
+      ThemeMode.dark,
+      ThemeMode.system,
+    ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-            const PageTitle(
-              iconData: Icons.settings,
-              title: '設定',
-            ),
-            gutter,
-            Row(children: [
-              returnButton,
-            ]),
-            gutter,
-            DropdownButton<ThemeMode>(
-              value: themeModeModel.mode,
-              onChanged: (ThemeMode? value) {
-                themeModeModel.mode = value ?? defaultThemeMode;
-              },
-              items: const [
-                DropdownMenuItem<ThemeMode>(
-                  value: ThemeMode.light,
-                  child: Text('ライトモード'),
-                ),
-                DropdownMenuItem<ThemeMode>(
-                  value: ThemeMode.dark,
-                  child: Text('ダークモード'),
-                ),
-                DropdownMenuItem<ThemeMode>(
-                  value: ThemeMode.system,
-                  child: Text('システムの設定に従う'),
-                ),
-              ],
-            ),
-          ] +
-          (authUser != null
-              ? [
-                  gutter,
-                  PrimaryButton(
-                    iconData: Icons.logout,
-                    label: 'ログアウト',
-                    onPressed: () {
-                      widget.pushRoute(AppRoutePath.top());
-                      auth.signOut();
-                    },
-                  ),
-                ]
-              : []),
-    );
+    return ContentBody([
+      const PageTitle(
+        iconData: Icons.settings,
+        title: 'アプリの情報と設定',
+      ),
+      FlexRow([
+        PrimaryButton(
+          iconData: Icons.policy,
+          label: 'プライバシー・ポリシー',
+          onPressed: () {
+            widget.pushRoute(AppRoutePath.policy());
+          },
+        ),
+        ShowAboutButton(
+          context: context,
+          appTitle: appTitle,
+          packageInfo: clientModel.packageInfo,
+        ),
+      ]),
+      FlexRow([
+        const Padding(
+          padding: EdgeInsets.only(top: 12.0),
+          child: Text('表示モード'),
+        ),
+        ToggleButtons(
+          children: const [
+            Icon(Icons.light_mode),
+            Icon(Icons.dark_mode),
+            Text('自動'),
+          ],
+          onPressed: (int index) {
+            setState(() {
+              themeModeModel.mode = themeModes[index];
+            });
+          },
+          isSelected: [
+            themeModeModel.mode == themeModes[0],
+            themeModeModel.mode == themeModes[1],
+            themeModeModel.mode == themeModes[2],
+          ],
+        ),
+      ]),
+      FlexRow((authUser != null
+          ? [
+              PrimaryButton(
+                iconData: Icons.logout,
+                label: 'ログアウト',
+                onPressed: () async {
+                  await auth.signOut();
+                  widget.pushRoute(AppRoutePath.top());
+                },
+              ),
+            ]
+          : [])),
+    ]);
   }
 }

@@ -31,19 +31,12 @@ class PolicyScreen extends BaseScreen {
 
 class _PolicyState extends BaseState {
   @override
-  Widget buildBody(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const PageTitle(
-          iconData: Icons.policy,
-          title: 'プライバシー・ポリシー',
-        ),
-        gutter,
-        Row(children: [
-          returnButton,
-        ]),
-      ],
-    );
+  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+    return const ContentBody([
+      PageTitle(
+        iconData: Icons.policy,
+        title: 'プライバシー・ポリシー',
+      ),
+    ]);
   }
 }

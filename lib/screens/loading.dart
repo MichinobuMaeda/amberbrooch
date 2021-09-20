@@ -17,12 +17,16 @@ class LoadingScreen extends BaseScreen {
 class _LoadingState extends BaseState {
   @override
   void initState() {
-    Provider.of<FirebaseModel>(context, listen: false).init();
+    ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
+    clientModel.init();
+    Provider.of<FirebaseModel>(context, listen: false).init(
+      deepLink: clientModel.deepLink,
+    );
     super.initState();
   }
 
   @override
-  Widget buildBody(BuildContext context) {
+  Widget buildBody(BuildContext context, BoxConstraints constraints) {
     return Consumer<FirebaseModel>(
       builder: (context, firebase, child) {
         if (!firebase.initialized) {

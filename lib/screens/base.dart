@@ -16,19 +16,10 @@ abstract class BaseScreen extends StatefulWidget {
 }
 
 abstract class BaseState extends State<BaseScreen> {
-  Widget buildBody(BuildContext context);
-  late PrimaryButton returnButton;
+  Widget buildBody(BuildContext context, BoxConstraints constraints);
 
   @override
   Widget build(BuildContext context) {
-    returnButton = PrimaryButton(
-      iconData: Icons.navigate_before,
-      label: '戻る',
-      onPressed: () {
-        widget.pushRoute(AppRoutePath.top());
-      },
-    );
-
     return Scaffold(
       appBar: Header(
         context: context,
@@ -43,7 +34,7 @@ abstract class BaseState extends State<BaseScreen> {
             constraints: BoxConstraints(
               minHeight: constraints.maxHeight - 44.0, // Height of AppBar
             ),
-            child: buildBody(context),
+            child: buildBody(context, constraints),
           ),
         );
       }),

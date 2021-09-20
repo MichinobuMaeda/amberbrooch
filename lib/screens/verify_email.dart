@@ -26,25 +26,24 @@ class _VerifyEmailState extends BaseState {
   }
 
   @override
-  Widget buildBody(BuildContext context) {
+  Widget buildBody(BuildContext context, BoxConstraints constraints) {
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
     AuthUser? authUser = authModel.getUser();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const PageTitle(
-          iconData: Icons.email,
-          title: 'メールアドレスの確認',
-        ),
-        gutter,
+    return ContentBody([
+      const PageTitle(
+        iconData: Icons.email,
+        title: 'メールアドレスの確認',
+      ),
+      FlexRow([
         Text(
           '確認のためのメールを ${authUser?.email} に' +
               (_sendVerificationMail
                   ? '送信しました。受信したメールの確認のためのリンクをクリックしてください。'
                   : '送信します。「送信」ボタンを押してください。'),
         ),
-        gutter,
+      ]),
+      FlexRow([
         PrimaryButton(
           iconData: Icons.send,
           label: '送信',
@@ -67,15 +66,19 @@ class _VerifyEmailState extends BaseState {
             );
           },
         ),
-        gutter,
-        const Text('やり直す場合はログアウトしてください。'),
-        gutter,
+      ]),
+      const FlexRow([
+        Text('やり直す場合はログアウトしてください。'),
+      ]),
+      FlexRow([
         PrimaryButton(
           iconData: Icons.logout,
           label: 'ログアウト',
-          onPressed: () => auth.signOut(),
+          onPressed: () async {
+            await auth.signOut();
+          },
         ),
-      ],
-    );
+      ]),
+    ]);
   }
 }
