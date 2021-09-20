@@ -113,7 +113,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
       builder: (context, confModel, child) {
         return Consumer<AuthModel>(
           builder: (context, authModel, child) {
-            AuthUser? authUser = authModel.getUser();
+            AuthUser? authUser = authModel.user;
 
             if (!confModel.initialized) {
               _state = AppState.loading;

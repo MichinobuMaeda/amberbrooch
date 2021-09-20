@@ -31,13 +31,15 @@ class _LoadingState extends BaseState {
       builder: (context, firebase, child) {
         if (!firebase.initialized) {
           if (!firebase.error) {
-            return const LoadingStatus(
+            return LoadingStatus(
               message: '接続の準備をしています。',
+              appOutdated: appOutdated,
             );
           } else {
             return LoadingStatus(
               message: '接続の設定のエラーです。',
               color: Theme.of(context).errorColor,
+              appOutdated: appOutdated,
               subsequents: const <Widget>[
                 Text('管理者に連絡してください。'),
               ],
@@ -51,14 +53,16 @@ class _LoadingState extends BaseState {
         confModel.listen();
 
         if (!confModel.initialized) {
-          return const LoadingStatus(
+          return LoadingStatus(
             message: 'サービスの設定を取得しています。',
+            appOutdated: appOutdated,
           );
         }
 
         return LoadingStatus(
           message: 'サービスの設定が取得できませんでした。',
           color: Theme.of(context).errorColor,
+          appOutdated: appOutdated,
           subsequents: const <Widget>[
             Text('管理者に連絡してください。'),
           ],

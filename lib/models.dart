@@ -83,7 +83,7 @@ class ConfModel extends ChangeNotifier {
     );
   }
 
-  Conf? getConf() => _conf;
+  Conf? get conf => _conf;
   bool get initialized => _initialized;
 }
 
@@ -146,7 +146,7 @@ class AuthModel extends ChangeNotifier {
     }
   }
 
-  AuthUser? getUser() => _user;
+  AuthUser? get user => _user;
 }
 
 class FirebaseModel extends ChangeNotifier {
@@ -210,13 +210,15 @@ class FirebaseModel extends ChangeNotifier {
 
 class ClientModel extends ChangeNotifier {
   final String deepLink;
-  late PackageInfo packageInfo;
+  PackageInfo? _packageInfo;
 
   ClientModel({required this.deepLink});
 
   void init() async {
-    packageInfo = await PackageInfo.fromPlatform();
+    _packageInfo = await PackageInfo.fromPlatform();
   }
+
+  PackageInfo? get packageInfo => _packageInfo;
 }
 
 class ThemeModeModel extends ChangeNotifier {

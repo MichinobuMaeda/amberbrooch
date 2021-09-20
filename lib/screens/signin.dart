@@ -34,12 +34,13 @@ class _SignInState extends BaseState {
   @override
   Widget buildBody(BuildContext context, BoxConstraints constraints) {
     ConfModel confModel = Provider.of<ConfModel>(context, listen: false);
-    Conf? conf = confModel.getConf();
+    Conf? conf = confModel.conf;
 
     return ContentBody([
-      const PageTitle(
+      PageTitle(
         iconData: Icons.login,
         title: 'ログイン',
+        appOutdated: appOutdated,
       ),
       FlexRow([
         PrimaryButton(

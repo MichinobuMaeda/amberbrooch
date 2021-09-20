@@ -1,6 +1,9 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../conf.dart';
 import '../router.dart';
+import '../models.dart';
 import '../widgets.dart';
 
 abstract class BaseScreen extends StatefulWidget {
@@ -17,9 +20,18 @@ abstract class BaseScreen extends StatefulWidget {
 
 abstract class BaseState extends State<BaseScreen> {
   Widget buildBody(BuildContext context, BoxConstraints constraints);
+  bool appOutdated = false;
 
   @override
   Widget build(BuildContext context) {
+    Conf? conf = Provider.of<ConfModel>(context, listen: false).conf;
+    PackageInfo? packageInfo =
+        Provider.of<ClientModel>(context, listen: false).packageInfo;
+    appOutdated = conf != null &&
+        packageInfo != null &&
+        (conf.version != packageInfo.version ||
+            conf.buildNumber != packageInfo.buildNumber);
+
     return Scaffold(
       appBar: Header(
         context: context,
@@ -32,7 +44,7 @@ abstract class BaseState extends State<BaseScreen> {
           padding: const EdgeInsets.all(12.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: constraints.maxHeight - 44.0, // Height of AppBar
+              minHeight: constraints.maxHeight - kToolbarHeight,
             ),
             child: buildBody(context, constraints),
           ),

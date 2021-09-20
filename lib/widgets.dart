@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import "package:universal_html/html.dart" as html;
 import 'router.dart';
 
 // SizedBox gutter = const SizedBox(width: 24.0, height: 24.0);
@@ -104,16 +107,23 @@ class Header extends AppBar {
 class PageTitle extends Widget {
   final String title;
   final IconData iconData;
+  final bool appOutdated;
 
   const PageTitle({
     Key? key,
     required this.title,
     required this.iconData,
+    required this.appOutdated,
   }) : super(key: key);
 
   @override
   Element createElement() {
     return FlexRow([
+      if (appOutdated)
+        Row(
+          children: const [Flexible(child: AppUpdateButton())],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
       Icon(iconData, size: 32.0),
       Text(title, style: const TextStyle(fontSize: 24.0)),
     ]).createElement();
@@ -123,11 +133,13 @@ class PageTitle extends Widget {
 class LoadingStatus extends Widget {
   final String message;
   final Color? color;
+  final bool appOutdated;
   final List<Widget> subsequents;
 
   const LoadingStatus({
     Key? key,
     required this.message,
+    required this.appOutdated,
     this.color,
     this.subsequents = const [],
   }) : super(key: key);
@@ -137,6 +149,7 @@ class LoadingStatus extends Widget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+            if (appOutdated) const Center(child: AppUpdateButton()),
             Center(
               child: Text(
                 message,
@@ -149,6 +162,27 @@ class LoadingStatus extends Widget {
             ),
           ] +
           subsequents,
+    ).createElement();
+  }
+}
+
+class AppUpdateButton extends Widget {
+  const AppUpdateButton({Key? key}) : super(key: key);
+
+  @override
+  Element createElement() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.download),
+      label: const Text(
+        'アプリを更新してください',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(300.0, 48.0),
+        primary: Colors.redAccent,
+      ),
+      onPressed: () => html.window.location.reload(),
     ).createElement();
   }
 }

@@ -39,7 +39,7 @@ class _PreferencesState extends BaseState {
     ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
     ThemeModeModel themeModeModel = Provider.of<ThemeModeModel>(context);
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
-    AuthUser? authUser = authModel.getUser();
+    AuthUser? authUser = authModel.user;
     List<ThemeMode> themeModes = [
       ThemeMode.light,
       ThemeMode.dark,
@@ -47,9 +47,10 @@ class _PreferencesState extends BaseState {
     ];
 
     return ContentBody([
-      const PageTitle(
+      PageTitle(
         iconData: Icons.settings,
         title: 'アプリの情報と設定',
+        appOutdated: appOutdated,
       ),
       FlexRow([
         PrimaryButton(

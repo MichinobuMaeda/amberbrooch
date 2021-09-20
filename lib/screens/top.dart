@@ -18,9 +18,10 @@ class _TopState extends BaseState {
   @override
   Widget buildBody(BuildContext context, BoxConstraints constraints) {
     return ContentBody([
-      const PageTitle(
+      PageTitle(
         iconData: Icons.home,
         title: appTitle,
+        appOutdated: appOutdated,
       ),
       FlexRow([
         PrimaryButton(

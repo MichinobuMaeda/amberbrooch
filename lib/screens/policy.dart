@@ -32,10 +32,11 @@ class PolicyScreen extends BaseScreen {
 class _PolicyState extends BaseState {
   @override
   Widget buildBody(BuildContext context, BoxConstraints constraints) {
-    return const ContentBody([
+    return ContentBody([
       PageTitle(
         iconData: Icons.policy,
         title: 'プライバシー・ポリシー',
+        appOutdated: appOutdated,
       ),
     ]);
   }

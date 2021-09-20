@@ -28,12 +28,13 @@ class _VerifyEmailState extends BaseState {
   @override
   Widget buildBody(BuildContext context, BoxConstraints constraints) {
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
-    AuthUser? authUser = authModel.getUser();
+    AuthUser? authUser = authModel.user;
 
     return ContentBody([
-      const PageTitle(
+      PageTitle(
         iconData: Icons.email,
         title: 'メールアドレスの確認',
+        appOutdated: appOutdated,
       ),
       FlexRow([
         Text(
@@ -56,7 +57,7 @@ class _VerifyEmailState extends BaseState {
               const Duration(seconds: 1),
               (timer) async {
                 await authModel.reload();
-                AuthUser? authUser = authModel.getUser();
+                AuthUser? authUser = authModel.user;
                 // debugPrint('${authUser?.emailVerified}');
                 if (authUser?.emailVerified == true) {
                   _timer?.cancel();
