@@ -20,6 +20,7 @@ class Conf {
   final String url;
   final String version;
   final String buildNumber;
+  final String policy;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -27,6 +28,7 @@ class Conf {
     required this.url,
     required this.version,
     required this.buildNumber,
+    required this.policy,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -37,6 +39,7 @@ class Conf {
       other.url == url &&
       other.version == version &&
       other.buildNumber == buildNumber &&
+      other.policy == policy &&
       other.createdAt == createdAt &&
       other.updatedAt == updatedAt;
 
@@ -45,6 +48,7 @@ class Conf {
         url,
         version,
         buildNumber,
+        policy,
         createdAt,
         updatedAt,
       );
@@ -65,6 +69,7 @@ class ConfModel extends ChangeNotifier {
             url: doc.get('url'),
             version: doc.get('version'),
             buildNumber: doc.get('buildNumber'),
+            policy: doc.get('policy'),
             createdAt: doc.get('createdAt').toDate(),
             updatedAt: doc.get('updatedAt').toDate(),
           );

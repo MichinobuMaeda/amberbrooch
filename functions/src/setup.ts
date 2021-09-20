@@ -92,6 +92,42 @@ const install = async (
     buildNumber: "1",
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,
+    policy: `## Heading 2
+
+### Heading 3
+
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+
+<https://flutter.dev/>
+
+[Flutter](https://flutter.dev/)
+
+- List item 1
+- List item 2
+- List item 3
+    1. List item 3.1
+    2. List item 3.2
+    3. List item 3.3
+- List item 4
+
+The quick brown fox jumps over the lazy dog.
+
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+
+The quick brown fox jumps over the lazy dog. The quick brown fox  \
+jumps over the lazy dog. The quick brown fox jumps over the lazy dog.
+
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+`,
     createdAt: ts,
     updatedAt: ts,
   });
