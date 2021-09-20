@@ -20,6 +20,8 @@ ThemeData theme = ThemeData(
 
 ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  primarySwatch: Colors.brown,
+  primarySwatch: Colors.amber,
   fontFamily: 'NotoSansJP',
 );
+
+ThemeMode defaultThemeMode = ThemeMode.light;
