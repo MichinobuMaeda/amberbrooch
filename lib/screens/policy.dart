@@ -106,7 +106,7 @@ class _PolicyState extends BaseState {
                     },
                   ),
                 ]),
-              if (me?.admin == true && !_editMode)
+              if (me?.admin != true || !_editMode)
                 FlexRow([
                   MarkdownBody(
                     key: _keyMarkdown,
