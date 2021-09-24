@@ -63,16 +63,6 @@ class _PolicyState extends BaseState {
                 appOutdated: appOutdated,
                 realoadApp: realoadApp,
               ),
-              if (_editMode)
-                FlexRow([
-                  TextField(
-                    key: _keyPolicy,
-                    controller: _policyController,
-                    focusNode: _policyFocusNode,
-                    maxLines: 10,
-                    autofocus: true,
-                  ),
-                ]),
               if (me?.admin == true && !_editMode)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -88,24 +78,34 @@ class _PolicyState extends BaseState {
                   ],
                 ),
               if (me?.admin == true && _editMode)
-                FlexRow([
-                  SaveButton(
-                    onPressed: () {
-                      _editMode = false;
-                      db.collection('service').doc('conf').update({
-                        'policy': _policyController.text,
-                        'updatedAt': DateTime.now(),
-                      });
-                    },
-                  ),
-                  CancelButton(
-                    onPressed: () {
-                      setState(() {
+                FlexRow(
+                  [
+                    SaveButton(
+                      onPressed: () {
                         _editMode = false;
-                      });
-                    },
-                  ),
-                ]),
+                        db.collection('service').doc('conf').update({
+                          'policy': _policyController.text,
+                          'updatedAt': DateTime.now(),
+                        });
+                      },
+                    ),
+                    CancelButton(
+                      onPressed: () {
+                        setState(() {
+                          _editMode = false;
+                        });
+                      },
+                    ),
+                    TextField(
+                      key: _keyPolicy,
+                      controller: _policyController,
+                      focusNode: _policyFocusNode,
+                      maxLines: 10,
+                      autofocus: true,
+                    ),
+                  ],
+                  alignment: WrapAlignment.end,
+                ),
               if (me?.admin != true || !_editMode)
                 FlexRow([
                   MarkdownBody(

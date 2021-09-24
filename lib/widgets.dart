@@ -110,12 +110,16 @@ class FlexRow extends Widget {
   final double spacing;
   final double runSpacing;
   final List<Widget> children;
+  final WrapAlignment alignment;
+  final WrapAlignment runAlignment;
 
   const FlexRow(
     this.children, {
     Key? key,
     this.spacing = 8.0,
     this.runSpacing = 8.0,
+    this.alignment = WrapAlignment.start,
+    this.runAlignment = WrapAlignment.start,
   }) : super(key: key);
 
   @override
@@ -125,6 +129,8 @@ class FlexRow extends Widget {
       child: Wrap(
         spacing: spacing,
         runSpacing: runSpacing,
+        alignment: alignment,
+        runAlignment: runAlignment,
         children: children,
       ),
     ).createElement();
