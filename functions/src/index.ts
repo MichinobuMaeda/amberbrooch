@@ -4,7 +4,7 @@ import * as express from "express";
 import * as cors from "cors";
 import {getAdminUser} from "./guard";
 import {initApi} from "./api";
-import * as users from "./users";
+import * as accounts from "./accounts";
 
 const REGION = "asia-northeast1";
 
@@ -20,7 +20,7 @@ export const api = functions.region(REGION)
 export const createUser = functions.region(REGION)
     .https.onCall(async (data, context) => {
       await getAdminUser(firebase, context.auth?.uid);
-      await users.createUser(
+      await accounts.createUser(
           firebase,
           data.name ?? "",
           data.admin ?? false,

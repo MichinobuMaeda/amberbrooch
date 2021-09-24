@@ -3,7 +3,7 @@ import {app} from "firebase-admin";
 import {createHash} from "crypto";
 import {nanoid} from "nanoid";
 
-const createUser = async (
+const createAccount = async (
     firebase: app.App,
     name: string,
     admin: boolean,
@@ -30,7 +30,7 @@ const createUser = async (
 
   const ts = new Date();
 
-  const user = await db.collection("users").add({
+  const account = await db.collection("accounts").add({
     name,
     admin,
     tester,
@@ -44,7 +44,7 @@ const createUser = async (
     deletedAt: null,
   });
 
-  const uid = user.id;
+  const uid = account.id;
   const displayName = name;
 
   const profile = email ?
@@ -77,7 +77,7 @@ const setUserName = async (
   }
 
   await auth.updateUser(uid, {displayName: name});
-  await db.collection("users").doc(uid).update({
+  await db.collection("accounts").doc(uid).update({
     name,
     updatedAt: new Date(),
   });
@@ -136,7 +136,7 @@ const invite = async (
   const code = nanoid();
   const ts = new Date();
   const invitation = calcInvitation(code, conf.get("seed"));
-  await db.collection("users").doc(uid).update({
+  await db.collection("accounts").doc(uid).update({
     invitation,
     invitedBy,
     invitedAt: ts,
@@ -155,36 +155,38 @@ const getToken = async (
   logger.info(`getToken: ${code}`);
   const conf = await db.collection("service").doc("conf").get();
   const invitation = calcInvitation(code, conf.get("seed"));
-  const users = await db.collection("users")
+  const accounts = await db.collection("accounts")
       .where("invitation", "==", invitation).get();
-  if (users.docs.length !== 1) {
+  if (accounts.docs.length !== 1) {
     throw new Error("No record");
   }
-  const user = users.docs[0];
-  if (!user.get("invitedAt") || !user.get("invitedBy")) {
-    await user.ref.update({
+  const account = accounts.docs[0];
+  if (!account.get("invitedAt") || !account.get("invitedBy")) {
+    await account.ref.update({
       invitation: null,
       invitedBy: null,
       invitedAt: null,
     });
-    throw new Error(`Invitation for user: ${user.id} has invalid status.`);
+    throw new Error(
+        `Invitation for account: ${account.id} has invalid status.`
+    );
   }
   const expired = new Date().getTime() - conf.get("invitationExpirationTime");
-  if (user.get("invitedAt").toDate().getTime() < expired) {
-    await user.ref.update({
+  if (account.get("invitedAt").toDate().getTime() < expired) {
+    await account.ref.update({
       invitation: null,
       invitedBy: null,
       invitedAt: null,
     });
-    throw new Error(`Invitation for user: ${user.id} is expired.`);
+    throw new Error(`Invitation for account: ${account.id} is expired.`);
   }
-  const token = await auth.createCustomToken(user.id);
-  logger.info(`Invited user: ${user.id} get token: ${token}`);
+  const token = await auth.createCustomToken(account.id);
+  logger.info(`Invited account: ${account.id} get token: ${token}`);
   return token;
 };
 
 export {
-  createUser,
+  createAccount as createUser,
   setUserName,
   setUserEmail,
   setUserPassword,

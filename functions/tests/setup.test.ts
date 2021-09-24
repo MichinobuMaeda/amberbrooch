@@ -9,13 +9,19 @@ import {
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const verRef = db.collection("service").doc("version");
 const confRef = db.collection("service").doc("conf");
 const ts = new Date("2020-01-01T00:00:00.000Z");
 
 beforeEach(async () => {
+  await verRef.set({
+    version: "1.0.0",
+    buildNumber: "1",
+    createdAt: ts,
+    updatedAt: ts,
+  });
   await confRef.set({
     url: "http://example.com/version.json",
-    version: "1.0.0",
     buildNumber: "1",
     createdAt: ts,
     updatedAt: ts,
@@ -23,6 +29,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  await verRef.delete();
   await confRef.delete();
 });
 
@@ -31,14 +38,14 @@ afterAll(async () => {
 });
 
 describe("updateVersion()", () => {
-  it("returns false if conf is not exists.", async () => {
+  it("returns false if version is not exists.", async () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.0",
         build_number: "1",
       },
     });
-    await confRef.delete();
+    await verRef.delete();
     const ret = await updateVersion(firebase);
     expect(ret).toBeFalsy();
   });
@@ -52,8 +59,8 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const conf = await confRef.get();
-    expect(conf.get("updatedAt").toDate()).toEqual(ts);
+    const ver = await verRef.get();
+    expect(ver.get("updatedAt").toDate()).toEqual(ts);
   });
   it("returns true and update conf has old version.", async () => {
     mockedAxios.get.mockResolvedValue({
@@ -64,10 +71,10 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const conf = await confRef.get();
-    expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(conf.get("version")).toEqual("1.0.1");
-    expect(conf.get("buildNumber")).toEqual("1");
+    const ver = await verRef.get();
+    expect(ver.get("updatedAt").toDate()).not.toEqual(ts);
+    expect(ver.get("version")).toEqual("1.0.1");
+    expect(ver.get("buildNumber")).toEqual("1");
   });
   it("returns true and update conf has old build_number.", async () => {
     mockedAxios.get.mockResolvedValue({
@@ -78,18 +85,18 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const conf = await confRef.get();
-    expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(conf.get("version")).toEqual("1.0.0");
-    expect(conf.get("buildNumber")).toEqual("2");
+    const ver = await verRef.get();
+    expect(ver.get("updatedAt").toDate()).not.toEqual(ts);
+    expect(ver.get("version")).toEqual("1.0.0");
+    expect(ver.get("buildNumber")).toEqual("2");
   });
 });
 
 describe("install()", () => {
-  it("create conf, primary user in testers group," +
-      " and testers group with primary user," +
+  it("create conf, primary account in testers group," +
+      " and testers group with primary account," +
       " and returns 'OK'.", async () => {
-    const name = "Primary user";
+    const name = "Primary account";
     const email = "primary@example.com";
     const password = "primary's password";
     const url = "https://example.com";
@@ -100,19 +107,19 @@ describe("install()", () => {
     expect(conf.get("url")).toEqual(url);
     expect(conf.get("seed")).toBeDefined();
     const testers = await db.collection("groups").doc("testers").get();
-    expect(testers.get("users")).toHaveLength(1);
-    const uid = testers.get("users")[0];
-    const primary = await db.collection("users").doc(uid).get();
+    expect(testers.get("accounts")).toHaveLength(1);
+    const uid = testers.get("accounts")[0];
+    const primary = await db.collection("accounts").doc(uid).get();
     expect(primary.get("name")).toEqual(name);
     expect(primary.get("admin")).toBeTruthy();
     expect(primary.get("tester")).toBeTruthy();
     expect(primary.get("valid")).toBeTruthy();
     expect(primary.get("group")).toEqual("testers");
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(name);
-    expect(user.email).toEqual(email);
-    expect(user.passwordHash).toBeDefined();
-    await db.collection("users").doc(uid).delete();
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(name);
+    expect(account.email).toEqual(email);
+    expect(account.passwordHash).toBeDefined();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });

@@ -1,10 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import '../conf.dart';
-import '../widgets.dart';
-import '../models.dart';
-import '../router.dart';
-import 'base.dart';
+part of amberbrooch;
 
 class PreferencesPage extends Page {
   final ValueChanged<AppRoutePath> pushRoute;
@@ -51,6 +45,7 @@ class _PreferencesState extends BaseState {
         iconData: Icons.settings,
         title: 'アプリの情報と設定',
         appOutdated: appOutdated,
+        realoadApp: realoadApp,
       ),
       FlexRow([
         PrimaryButton(

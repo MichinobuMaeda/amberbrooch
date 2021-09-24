@@ -1,12 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'models.dart';
-import 'screens/loading.dart';
-import 'screens/signin.dart';
-import 'screens/verify_email.dart';
-import 'screens/top.dart';
-import 'screens/policy.dart';
-import 'screens/preferences.dart';
+part of amberbrooch;
 
 class AppRoutePath {
   final String name;
@@ -109,13 +101,21 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ConfModel>(
-      builder: (context, confModel, child) {
+    return Consumer<VersionModel>(
+      builder: (context, versionModel, child) {
         return Consumer<AuthModel>(
           builder: (context, authModel, child) {
             AuthUser? authUser = authModel.user;
+            Provider.of<AccountsModel>(context, listen: false).listen(
+              authUser?.id,
+              realoadApp,
+              signOut,
+              Provider.of<MeModel>(context, listen: false),
+              Provider.of<GroupsModel>(context, listen: false),
+              Provider.of<GroupModel>(context, listen: false),
+            );
 
-            if (!confModel.initialized) {
+            if (versionModel.version == null) {
               _state = AppState.loading;
             } else if (authUser == null) {
               _state = AppState.guest;

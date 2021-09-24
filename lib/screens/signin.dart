@@ -1,14 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:firebase_auth/firebase_auth.dart';
-import "package:universal_html/html.dart";
-import '../conf.dart';
-import '../models.dart';
-import '../widgets.dart';
-import '../router.dart';
-import '../validators.dart';
-import 'base.dart';
+part of amberbrooch;
 
 class SignInScreen extends BaseScreen {
   const SignInScreen({
@@ -41,6 +31,7 @@ class _SignInState extends BaseState {
         iconData: Icons.login,
         title: 'ログイン',
         appOutdated: appOutdated,
+        realoadApp: realoadApp,
       ),
       FlexRow([
         PrimaryButton(
@@ -90,7 +81,8 @@ class _SignInState extends BaseState {
                         handleCodeInApp: true,
                       ),
                     );
-                    window.localStorage['amberbrooch_email'] = _email ?? '';
+                    html.window.localStorage['amberbrooch_email'] =
+                        _email ?? '';
                     setState(() {
                       _sendEmailLink = true;
                     });

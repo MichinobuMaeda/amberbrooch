@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import '../conf.dart';
-import '../widgets.dart';
-import '../router.dart';
-import 'base.dart';
+part of amberbrooch;
 
 class TopScreen extends BaseScreen {
   const TopScreen({
@@ -22,6 +18,7 @@ class _TopState extends BaseState {
         iconData: Icons.home,
         title: appTitle,
         appOutdated: appOutdated,
+        realoadApp: realoadApp,
       ),
       FlexRow([
         PrimaryButton(

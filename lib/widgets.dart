@@ -1,24 +1,19 @@
-import 'dart:io';
+part of amberbrooch;
 
-import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import "package:universal_html/html.dart" as html;
-import 'router.dart';
-
-// SizedBox gutter = const SizedBox(width: 24.0, height: 24.0);
-
-class PrimaryButton extends Widget {
+abstract class _IconButton extends Widget {
   final IconData iconData;
   final String label;
   final bool disabled;
   final VoidCallback onPressed;
+  final Color? primary;
 
-  const PrimaryButton({
+  const _IconButton({
     Key? key,
     required this.iconData,
     required this.label,
     this.disabled = false,
     required this.onPressed,
+    this.primary,
   }) : super(key: key);
 
   @override
@@ -29,9 +24,70 @@ class PrimaryButton extends Widget {
       onPressed: disabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(120, 48),
+        primary: primary,
       ),
     ).createElement();
   }
+}
+
+class PrimaryButton extends _IconButton {
+  const PrimaryButton({
+    Key? key,
+    required IconData iconData,
+    required String label,
+    bool disabled = false,
+    required VoidCallback onPressed,
+  }) : super(
+          key: key,
+          iconData: iconData,
+          label: label,
+          disabled: disabled,
+          onPressed: onPressed,
+        );
+}
+
+class SecondaryButton extends _IconButton {
+  const SecondaryButton({
+    Key? key,
+    required IconData iconData,
+    required String label,
+    bool disabled = false,
+    required VoidCallback onPressed,
+  }) : super(
+            key: key,
+            iconData: iconData,
+            label: label,
+            disabled: disabled,
+            onPressed: onPressed,
+            primary: Colors.blueGrey);
+}
+
+class SaveButton extends PrimaryButton {
+  const SaveButton({
+    Key? key,
+    bool disabled = false,
+    required VoidCallback onPressed,
+  }) : super(
+          key: key,
+          iconData: Icons.save_alt,
+          label: '保存',
+          disabled: disabled,
+          onPressed: onPressed,
+        );
+}
+
+class CancelButton extends SecondaryButton {
+  const CancelButton({
+    Key? key,
+    bool disabled = false,
+    required VoidCallback onPressed,
+  }) : super(
+          key: key,
+          iconData: Icons.cancel,
+          label: '中止',
+          disabled: disabled,
+          onPressed: onPressed,
+        );
 }
 
 class ContentBody extends Widget {
@@ -108,12 +164,14 @@ class PageTitle extends Widget {
   final String title;
   final IconData iconData;
   final bool appOutdated;
+  final Function realoadApp;
 
   const PageTitle({
     Key? key,
     required this.title,
     required this.iconData,
     required this.appOutdated,
+    required this.realoadApp,
   }) : super(key: key);
 
   @override
@@ -121,7 +179,7 @@ class PageTitle extends Widget {
     return FlexRow([
       if (appOutdated)
         Row(
-          children: const [Flexible(child: AppUpdateButton())],
+          children: [Flexible(child: AppUpdateButton(realoadApp: realoadApp))],
           mainAxisAlignment: MainAxisAlignment.center,
         ),
       Icon(iconData, size: 32.0),
@@ -135,6 +193,7 @@ class LoadingStatus extends Widget {
   final Color? color;
   final bool appOutdated;
   final List<Widget> subsequents;
+  final Function realoadApp;
 
   const LoadingStatus({
     Key? key,
@@ -142,6 +201,7 @@ class LoadingStatus extends Widget {
     required this.appOutdated,
     this.color,
     this.subsequents = const [],
+    required this.realoadApp,
   }) : super(key: key);
 
   @override
@@ -149,7 +209,8 @@ class LoadingStatus extends Widget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-            if (appOutdated) const Center(child: AppUpdateButton()),
+            if (appOutdated)
+              Center(child: AppUpdateButton(realoadApp: realoadApp)),
             Center(
               child: Text(
                 message,
@@ -167,7 +228,12 @@ class LoadingStatus extends Widget {
 }
 
 class AppUpdateButton extends Widget {
-  const AppUpdateButton({Key? key}) : super(key: key);
+  final Function realoadApp;
+
+  const AppUpdateButton({
+    Key? key,
+    required this.realoadApp,
+  }) : super(key: key);
 
   @override
   Element createElement() {
@@ -182,7 +248,7 @@ class AppUpdateButton extends Widget {
         minimumSize: const Size(300.0, 48.0),
         primary: Colors.redAccent,
       ),
-      onPressed: () => html.window.location.reload(),
+      onPressed: () => realoadApp(),
     ).createElement();
   }
 }

@@ -1,9 +1,4 @@
-import 'dart:async';
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import '../models.dart';
-import '../widgets.dart';
-import 'base.dart';
+part of amberbrooch;
 
 class VerifyEmailScreen extends BaseScreen {
   const VerifyEmailScreen({
@@ -35,15 +30,20 @@ class _VerifyEmailState extends BaseState {
         iconData: Icons.email,
         title: 'メールアドレスの確認',
         appOutdated: appOutdated,
+        realoadApp: realoadApp,
       ),
       FlexRow([
         Text(
-          '確認のためのメールを ${authUser?.email} に' +
-              (_sendVerificationMail
-                  ? '送信しました。受信したメールの確認のためのリンクをクリックしてください。'
-                  : '送信します。「送信」ボタンを押してください。'),
+          '確認のためのメールを ${authUser?.email} に送信します。「送信」ボタンを押してください。',
         ),
       ]),
+      if (_sendVerificationMail)
+        FlexRow([
+          Text(
+            '確認のためのメールを ${authUser?.email} に送信しました。'
+            '受信したメールの確認のためのリンクをクリックしてください。',
+          ),
+        ]),
       FlexRow([
         PrimaryButton(
           iconData: Icons.send,

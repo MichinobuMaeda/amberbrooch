@@ -1,10 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import '../conf.dart';
-import '../router.dart';
-import '../models.dart';
-import '../widgets.dart';
+part of amberbrooch;
 
 abstract class BaseScreen extends StatefulWidget {
   final ValueChanged<AppRoutePath> pushRoute;
@@ -24,13 +18,13 @@ abstract class BaseState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Conf? conf = Provider.of<ConfModel>(context, listen: false).conf;
+    Version? ver = Provider.of<VersionModel>(context, listen: false).version;
     PackageInfo? packageInfo =
         Provider.of<ClientModel>(context, listen: false).packageInfo;
-    appOutdated = conf != null &&
+    appOutdated = ver != null &&
         packageInfo != null &&
-        (conf.version != packageInfo.version ||
-            conf.buildNumber != packageInfo.buildNumber);
+        (ver.version != packageInfo.version ||
+            ver.buildNumber != packageInfo.buildNumber);
 
     return Scaffold(
       appBar: Header(

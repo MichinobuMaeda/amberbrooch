@@ -3,29 +3,29 @@ import {app} from "firebase-admin";
 import axios from "axios";
 import {createHash} from "crypto";
 import {nanoid} from "nanoid";
-import {createUser} from "./users";
+import {createUser} from "./accounts";
 
 const updateVersion = async (firebase: app.App): Promise<boolean> => {
   const db = firebase.firestore();
 
-  const conf = await db.collection("service").doc("conf").get();
-  if (!conf || !conf.exists) {
+  const ver = await db.collection("service").doc("version").get();
+  if (!ver || !ver.exists) {
     return false;
   }
 
   const res = await axios.get(
-      `${conf.get("url")}version.json?check=${new Date().getTime()}`
+      `${ver.get("url")}version.json?check=${new Date().getTime()}`
   );
   const version = res.data.version;
   const buildNumber = res.data.build_number;
 
   if (
-    (version !== conf.get("version")) ||
-    (buildNumber !== conf.get("buildNumber"))
+    (version !== ver.get("version")) ||
+    (buildNumber !== ver.get("buildNumber"))
   ) {
     logger.info(`${version}+${buildNumber}`);
 
-    await db.collection("service").doc("conf").update({
+    await db.collection("service").doc("version").update({
       version,
       buildNumber,
       updatedAt: new Date(),
@@ -86,10 +86,15 @@ const install = async (
   hash.update(url);
   const seed = hash.digest("hex");
 
-  await db.collection("service").doc("conf").set({
-    url,
+  await db.collection("service").doc("version").set({
     version: "1.0.0",
     buildNumber: "1",
+    createdAt: ts,
+    updatedAt: ts,
+  });
+
+  await db.collection("service").doc("conf").set({
+    url,
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,
     policy: `## Heading 2
@@ -146,7 +151,7 @@ The quick brown fox jumps over the lazy dog.
   await db.collection("groups").doc(testers).set({
     name: "テスト",
     desc: "テスト用のグループ",
-    users: [uid],
+    accounts: [uid],
     createdAt: ts,
     updatedAt: ts,
     deletedAt: null,

@@ -8,7 +8,7 @@ import {
   setUserPassword,
   invite,
   getToken,
-} from "../src/users";
+} from "../src/accounts";
 
 const confRef = db.collection("service").doc("conf");
 const ts = new Date("2020-01-01T00:00:00.000Z");
@@ -53,28 +53,28 @@ describe("createUser()", () => {
     )).rejects.toThrow("Param password is empty.");
   });
 
-  it("creates user with given properties," +
+  it("creates account with given properties," +
       " and returns uid.", async () => {
     const name = "User 01";
 
     const uid = await createUser(firebase, name, false, false);
 
     expect(uid).toBeDefined();
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("name")).toEqual(name);
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeFalsy();
     expect(doc.get("valid")).toBeTruthy();
     expect(doc.get("group")).toBeNull();
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(name);
-    expect(user.email).not.toBeDefined();
-    expect(user.passwordHash).not.toBeDefined();
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(name);
+    expect(account.email).not.toBeDefined();
+    expect(account.passwordHash).not.toBeDefined();
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
-  it("creates user with given properties inclueds group," +
+  it("creates account with given properties inclueds group," +
       " and returns uid.", async () => {
     const name = "User 01";
     const group = "group01";
@@ -82,69 +82,69 @@ describe("createUser()", () => {
     const uid = await createUser(firebase, name, true, false, group);
 
     expect(uid).toBeDefined();
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("name")).toEqual(name);
     expect(doc.get("admin")).toBeTruthy();
     expect(doc.get("tester")).toBeFalsy();
     expect(doc.get("valid")).toBeTruthy();
     expect(doc.get("group")).toEqual(group);
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(name);
-    expect(user.email).not.toBeDefined();
-    expect(user.passwordHash).not.toBeDefined();
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(name);
+    expect(account.email).not.toBeDefined();
+    expect(account.passwordHash).not.toBeDefined();
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
-  it("creates user with given properties inclueds email," +
+  it("creates account with given properties inclueds email," +
       " and returns uid.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
+    const email = "account01@example.com";
 
     const uid = await createUser(
         firebase, name, false, true, group, email
     );
 
     expect(uid).toBeDefined();
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("name")).toEqual(name);
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeTruthy();
     expect(doc.get("valid")).toBeTruthy();
     expect(doc.get("group")).toEqual(group);
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(name);
-    expect(user.email).toEqual(email);
-    expect(user.passwordHash).not.toBeDefined();
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(name);
+    expect(account.email).toEqual(email);
+    expect(account.passwordHash).not.toBeDefined();
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
-  it("creates user with given properties inclueds password," +
+  it("creates account with given properties inclueds password," +
       " and returns uid.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
-    const password = "user01's password";
+    const email = "account01@example.com";
+    const password = "account01's password";
 
     const uid = await createUser(
         firebase, name, false, true, group, email, password
     );
 
     expect(uid).toBeDefined();
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("name")).toEqual(name);
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeTruthy();
     expect(doc.get("valid")).toBeTruthy();
     expect(doc.get("group")).toEqual(group);
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(name);
-    expect(user.email).toEqual(email);
-    expect(user.passwordHash).toBeDefined();
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(name);
+    expect(account.email).toEqual(email);
+    expect(account.passwordHash).toBeDefined();
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });
@@ -158,7 +158,7 @@ describe("setUserName()", () => {
     await expect(setUserName(firebase, uid, ""))
         .rejects.toThrow("Param name is missing.");
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
   it("updates name of doc and auth entry.", async () => {
@@ -169,13 +169,13 @@ describe("setUserName()", () => {
 
     await setUserName(firebase, uid, newName);
 
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("name")).toEqual(newName);
     expect(doc.get("updatedAt")).not.toEqual(doc.get("createdAt"));
-    const user = await auth.getUser(uid);
-    expect(user.displayName).toEqual(newName);
+    const account = await auth.getUser(uid);
+    expect(account.displayName).toEqual(newName);
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });
@@ -184,31 +184,31 @@ describe("setUserEmail()", () => {
   it("rejects email with length 0.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
+    const email = "account01@example.com";
     const uid = await createUser(firebase, name, true, false, group, email);
 
     await expect(setUserEmail(firebase, uid, ""))
         .rejects.toThrow("Param email is empty.");
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
   it("updates email of auth entry.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
+    const email = "account01@example.com";
     const uid = await createUser(firebase, name, true, false, group, email);
     const newEmail = "new@example.com";
 
     await setUserEmail(firebase, uid, newEmail);
 
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("updatedAt")).toEqual(doc.get("createdAt"));
-    const user = await auth.getUser(uid);
-    await db.collection("users").doc(uid).delete();
-    expect(user.email).toEqual(newEmail);
+    const account = await auth.getUser(uid);
+    await db.collection("accounts").doc(uid).delete();
+    expect(account.email).toEqual(newEmail);
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });
@@ -217,46 +217,46 @@ describe("setUserPassword()", () => {
   it("rejects password with length 0.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
+    const email = "account01@example.com";
     const uid = await createUser(firebase, name, true, false, group, email);
 
     await expect(setUserPassword(firebase, uid, ""))
         .rejects.toThrow("Param password is empty.");
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
   it("updates password of auth entry.", async () => {
     const name = "User 01";
     const group = "group01";
-    const email = "user01@example.com";
+    const email = "account01@example.com";
     const uid = await createUser(firebase, name, true, false, group, email);
     const password = "new password";
 
     await setUserPassword(firebase, uid, password);
 
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("updatedAt")).toEqual(doc.get("createdAt"));
-    const user = await auth.getUser(uid);
-    await db.collection("users").doc(uid).delete();
-    expect(user.passwordHash).toBeDefined();
+    const account = await auth.getUser(uid);
+    await db.collection("accounts").doc(uid).delete();
+    expect(account.passwordHash).toBeDefined();
 
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });
 
 describe("invite()", () => {
   it("creates invitation code and" +
-      " save hashed code, host user id and timestamp," +
+      " save hashed code, host account id and timestamp," +
       " and return invitation code.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
 
     const code = await invite(firebase, admin, uid);
 
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await db.collection("accounts").doc(uid).get();
     expect(doc.get("updatedAt")).not.toEqual(doc.get("createdAt"));
     const hash = createHash("sha256");
     hash.update(code);
@@ -264,91 +264,91 @@ describe("invite()", () => {
     expect(doc.get("invitation")).toEqual(hash.digest("hex"));
     expect(doc.get("invitedBy")).toEqual(adminId);
     expect(doc.get("invitedAt")).toEqual(doc.get("updatedAt"));
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });
 
 describe("getToken()", () => {
   it("rejects invitation without record.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
     const code = await invite(firebase, admin, uid);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
 
     await expect(getToken(firebase, code))
         .rejects.toThrow("No record");
 
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
   });
 
-  it("rejects invitation without host user id.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+  it("rejects invitation without host account id.", async () => {
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
     const code = await invite(firebase, admin, uid);
-    await db.collection("users").doc(uid).update({
+    await db.collection("accounts").doc(uid).update({
       invitedBy: null,
     });
 
     await expect(getToken(firebase, code))
-        .rejects.toThrow(`Invitation for user: ${uid} has invalid status.`);
+        .rejects.toThrow(`Invitation for account: ${uid} has invalid status.`);
 
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 
   it("rejects invitation without timestamp.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
     const code = await invite(firebase, admin, uid);
-    await db.collection("users").doc(uid).update({
+    await db.collection("accounts").doc(uid).update({
       invitedAt: null,
     });
 
     await expect(getToken(firebase, code))
-        .rejects.toThrow(`Invitation for user: ${uid} has invalid status.`);
+        .rejects.toThrow(`Invitation for account: ${uid} has invalid status.`);
 
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 
   it("rejects invitation with expired timestamp.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
     const code = await invite(firebase, admin, uid);
-    await db.collection("users").doc(uid).update({
+    await db.collection("accounts").doc(uid).update({
       invitedAt: new Date(
           new Date().getTime() - invitationExpirationTime - 1000
       ),
     });
 
     await expect(getToken(firebase, code))
-        .rejects.toThrow(`Invitation for user: ${uid} is expired.`);
+        .rejects.toThrow(`Invitation for account: ${uid} is expired.`);
 
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 
   it("returns token.", async () => {
-    const adminId = await createUser(firebase, "Admin user", true, false);
-    const admin = await db.collection("users").doc(adminId).get();
-    const uid = await createUser(firebase, "user 01", false, false);
+    const adminId = await createUser(firebase, "Admin account", true, false);
+    const admin = await db.collection("accounts").doc(adminId).get();
+    const uid = await createUser(firebase, "account 01", false, false);
     const code = await invite(firebase, admin, uid);
-    await db.collection("users").doc(uid).update({
+    await db.collection("accounts").doc(uid).update({
       invitedAt: new Date(
           new Date().getTime() - invitationExpirationTime + 1000
       ),
@@ -357,9 +357,9 @@ describe("getToken()", () => {
     const token = await getToken(firebase, code);
 
     expect(token).toBeDefined();
-    await db.collection("users").doc(adminId).delete();
+    await db.collection("accounts").doc(adminId).delete();
     await auth.deleteUser(adminId);
-    await db.collection("users").doc(uid).delete();
+    await db.collection("accounts").doc(uid).delete();
     await auth.deleteUser(uid);
   });
 });

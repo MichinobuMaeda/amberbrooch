@@ -8,26 +8,26 @@ export const getValidUser = async (
     throw new Error("Param uid is missing.");
   }
   const db = firebase.firestore();
-  const user = await db.collection("users").doc(uid).get();
-  if (!user || !user.exists) {
+  const account = await db.collection("accounts").doc(uid).get();
+  if (!account || !account.exists) {
     throw new Error(`User: ${uid} is not exists.`);
   }
-  if (!user.get("valid")) {
+  if (!account.get("valid")) {
     throw new Error(`User: ${uid} is not valid.`);
   }
-  if (user.get("deletedAt")) {
+  if (account.get("deletedAt")) {
     throw new Error(`User: ${uid} has deleted.`);
   }
-  return user;
+  return account;
 };
 
 export const getAdminUser = async (
     firebase: app.App,
     uid?: string
 ): Promise<FirebaseFirestore.DocumentSnapshot> => {
-  const user = await getValidUser(firebase, uid);
-  if (!user.get("admin")) {
+  const account = await getValidUser(firebase, uid);
+  if (!account.get("admin")) {
     throw new Error(`User: ${uid} is not admin.`);
   }
-  return user;
+  return account;
 };

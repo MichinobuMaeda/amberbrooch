@@ -1,8 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import '../models.dart';
-import '../widgets.dart';
-import 'base.dart';
+part of amberbrooch;
 
 class LoadingScreen extends BaseScreen {
   const LoadingScreen({
@@ -18,7 +14,7 @@ class _LoadingState extends BaseState {
   @override
   void initState() {
     ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
-    clientModel.init();
+    clientModel.setPackageInfo();
     Provider.of<FirebaseModel>(context, listen: false).init(
       deepLink: clientModel.deepLink,
     );
@@ -34,6 +30,7 @@ class _LoadingState extends BaseState {
             return LoadingStatus(
               message: '接続の準備をしています。',
               appOutdated: appOutdated,
+              realoadApp: realoadApp,
             );
           } else {
             return LoadingStatus(
@@ -43,29 +40,35 @@ class _LoadingState extends BaseState {
               subsequents: const <Widget>[
                 Text('管理者に連絡してください。'),
               ],
+              realoadApp: realoadApp,
             );
           }
         }
 
         AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
         ConfModel confModel = Provider.of<ConfModel>(context, listen: false);
+        VersionModel versionModel =
+            Provider.of<VersionModel>(context, listen: false);
         authModel.listen();
         confModel.listen();
+        versionModel.listen();
 
-        if (!confModel.initialized) {
+        if (!versionModel.initialized) {
           return LoadingStatus(
-            message: 'サービスの設定を取得しています。',
+            message: 'システムの情報を取得しています。',
             appOutdated: appOutdated,
+            realoadApp: realoadApp,
           );
         }
 
         return LoadingStatus(
-          message: 'サービスの設定が取得できませんでした。',
+          message: 'システムの情報が取得できませんでした。',
           color: Theme.of(context).errorColor,
           appOutdated: appOutdated,
           subsequents: const <Widget>[
             Text('管理者に連絡してください。'),
           ],
+          realoadApp: realoadApp,
         );
       },
     );
