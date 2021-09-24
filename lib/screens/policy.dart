@@ -78,34 +78,31 @@ class _PolicyState extends BaseState {
                   ],
                 ),
               if (me?.admin == true && _editMode)
-                FlexRow(
-                  [
-                    SaveButton(
-                      onPressed: () {
+                FlexRow([
+                  SaveButton(
+                    onPressed: () {
+                      _editMode = false;
+                      db.collection('service').doc('conf').update({
+                        'policy': _policyController.text,
+                        'updatedAt': DateTime.now(),
+                      });
+                    },
+                  ),
+                  CancelButton(
+                    onPressed: () {
+                      setState(() {
                         _editMode = false;
-                        db.collection('service').doc('conf').update({
-                          'policy': _policyController.text,
-                          'updatedAt': DateTime.now(),
-                        });
-                      },
-                    ),
-                    CancelButton(
-                      onPressed: () {
-                        setState(() {
-                          _editMode = false;
-                        });
-                      },
-                    ),
-                    TextField(
-                      key: _keyPolicy,
-                      controller: _policyController,
-                      focusNode: _policyFocusNode,
-                      maxLines: 10,
-                      autofocus: true,
-                    ),
-                  ],
-                  alignment: WrapAlignment.end,
-                ),
+                      });
+                    },
+                  ),
+                  TextField(
+                    key: _keyPolicy,
+                    controller: _policyController,
+                    focusNode: _policyFocusNode,
+                    maxLines: 10,
+                    autofocus: true,
+                  ),
+                ], alignment: WrapAlignment.end),
               if (me?.admin != true || !_editMode)
                 FlexRow([
                   MarkdownBody(
