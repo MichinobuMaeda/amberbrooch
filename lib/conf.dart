@@ -12,6 +12,8 @@ const String testPassword = 'password';
 
 const String appTitle = 'Amber brooch';
 
+const double maxContentBodyWidth = 960.0;
+
 const TextTheme textTheme = TextTheme(
   subtitle1: TextStyle(fontSize: 18.0), // 16.0
   subtitle2: TextStyle(fontSize: 16.0), // 14.0

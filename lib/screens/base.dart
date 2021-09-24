@@ -36,11 +36,14 @@ abstract class BaseState extends State<BaseScreen> {
           builder: (BuildContext context, BoxConstraints constraints) {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(12.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight - kToolbarHeight,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - kToolbarHeight,
+                maxWidth: maxContentBodyWidth,
+              ),
+              child: buildBody(context, constraints),
             ),
-            child: buildBody(context, constraints),
           ),
         );
       }),
