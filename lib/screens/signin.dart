@@ -48,7 +48,7 @@ class _SignInState extends BaseState {
           child: Wrap(children: [
             FlexRow([
               SizedBox(
-                width: 512.0,
+                width: maxContentBodyWidth / 2,
                 child: TextFormField(
                   key: _keyEmail,
                   initialValue: _email,
@@ -93,7 +93,7 @@ class _SignInState extends BaseState {
                   }
                 },
               ),
-            ]),
+            ], alignment: WrapAlignment.end),
             FlexRow(_errorEmailLink
                 ? [
                     Text(
@@ -110,7 +110,7 @@ class _SignInState extends BaseState {
                     : []),
             FlexRow([
               SizedBox(
-                width: 512.0,
+                width: maxContentBodyWidth / 2,
                 child: TextFormField(
                   key: _keyPassword,
                   initialValue: _password,
@@ -155,7 +155,7 @@ class _SignInState extends BaseState {
                   }
                 },
               ),
-            ]),
+            ], alignment: WrapAlignment.end),
             FlexRow(_errorEmailAndPassword
                 ? [
                     Text(

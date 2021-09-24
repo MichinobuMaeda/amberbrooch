@@ -32,8 +32,10 @@ abstract class BaseState extends State<BaseScreen> {
         pushRoute: widget.pushRoute,
         appTitle: appTitle,
       ),
-      body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
+      body: LayoutBuilder(builder: (
+        BuildContext context,
+        BoxConstraints constraints,
+      ) {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(12.0),
           child: Center(
