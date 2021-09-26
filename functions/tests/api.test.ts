@@ -4,7 +4,7 @@ import * as express from "express";
 import axios from "axios";
 import {firebase, db} from "./config";
 import {
-  initApi,
+  init,
 } from "../src/api";
 
 jest.mock("axios");
@@ -21,7 +21,7 @@ describe("get: /setup", () => {
   it("send the installer if document 'ver' is not exists.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.get("/setup");
 
     expect(response.status).toBe(200);
@@ -44,7 +44,7 @@ describe("get: /setup", () => {
 
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.get("/setup");
 
     expect(response.status).toBe(200);
@@ -57,15 +57,14 @@ describe("get: /setup", () => {
 describe("post: /setup", () => {
   it("send text 'OK' if document 'version' is not exists " +
       "for request without requestUrl.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      "name=Test%201" +
-      "&email=test1@example.com" +
-      "&password=password" +
-      "&url=http%3A%2F%2Flocalhost%3A5000%2F"
+        "name=Test%201" +
+        "&email=test1@example.com" +
+        "&password=password" +
+        "&url=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(200);
@@ -75,16 +74,15 @@ describe("post: /setup", () => {
   });
   it("send status 302 if document 'version' is not exists " +
       "for request with requestUrl.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      "name=Test%2012" +
-      "&email=test2@example.com" +
-      "&password=password" +
-      "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
-      "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
+        "name=Test%2012" +
+        "&email=test2@example.com" +
+        "&password=password" +
+        "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
+        "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(302);
@@ -93,16 +91,15 @@ describe("post: /setup", () => {
   });
   it("send status 400 if document 'version' is not exists " +
       "for request without name.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      // "name=Test%2013" +
-      "&email=test3@example.com" +
-      "&password=password" +
-      "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
-      "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
+        // "name=Test%2013" +
+        "&email=test3@example.com" +
+        "&password=password" +
+        "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
+        "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(400);
@@ -111,16 +108,15 @@ describe("post: /setup", () => {
   });
   it("send status 400 if document 'version' is not exists " +
       "for request without email.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      "name=Test%2013" +
-      // "&email=test3@example.com" +
-      "&password=password" +
-      "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
-      "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
+        "name=Test%2013" +
+        // "&email=test3@example.com" +
+        "&password=password" +
+        "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
+        "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(400);
@@ -129,16 +125,15 @@ describe("post: /setup", () => {
   });
   it("send status 400 if document 'version' is not exists " +
       "for request without password.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      "name=Test%2013" +
-      "&email=test3@example.com" +
-      // "&password=password" +
-      "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
-      "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
+        "name=Test%2013" +
+        "&email=test3@example.com" +
+        // "&password=password" +
+        "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
+        "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(400);
@@ -147,16 +142,15 @@ describe("post: /setup", () => {
   });
   it("send status 400 if document 'version' is not exists " +
       "for request without url.", async () => {
-
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup").send(
-      "name=Test%2013" +
-      "&email=test3@example.com" +
-      "&password=password" +
-      // "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
-      "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
+        "name=Test%2013" +
+        "&email=test3@example.com" +
+        "&password=password" +
+        // "&url=http%3A%2F%2Flocalhost%3A5000%2F" +
+        "&requestUrl=http%3A%2F%2Flocalhost%3A5000%2F"
     );
 
     expect(response.status).toBe(400);
@@ -173,7 +167,7 @@ describe("post: /setup", () => {
 
     const app = express();
     app.use(express.urlencoded({extended: true}));
-    const request = supertest(initApi(firebase, app));
+    const request = supertest(init(firebase, app));
     const response = await request.post("/setup");
 
     expect(response.status).toBe(406);

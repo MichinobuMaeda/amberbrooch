@@ -1,6 +1,6 @@
 import {app} from "firebase-admin";
 
-export const getValidUser = async (
+export const valid = async (
     firebase: app.App,
     uid?: string
 ): Promise<FirebaseFirestore.DocumentSnapshot> => {
@@ -21,11 +21,11 @@ export const getValidUser = async (
   return account;
 };
 
-export const getAdminUser = async (
+export const admin = async (
     firebase: app.App,
     uid?: string
 ): Promise<FirebaseFirestore.DocumentSnapshot> => {
-  const account = await getValidUser(firebase, uid);
+  const account = await valid(firebase, uid);
   if (!account.get("admin")) {
     throw new Error(`User: ${uid} is not admin.`);
   }

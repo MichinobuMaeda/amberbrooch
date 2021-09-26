@@ -1,8 +1,8 @@
 /// <reference types="@types/jest" />
 import {firebase, db} from "./config";
 import {
-  getValidUser,
-  getAdminUser,
+  valid,
+  admin,
 } from "../src/guard";
 
 beforeEach(async () => {
@@ -56,54 +56,54 @@ afterAll(async () => {
   await firebase.delete();
 });
 
-describe("getValidUser()", () => {
+describe("valid()", () => {
   it("rejects undefined uid.", async () => {
-    await expect(getValidUser(firebase))
+    await expect(valid(firebase))
         .rejects.toThrow("Param uid is missing.");
   });
   it("rejects uid without doc.", async () => {
-    await expect(getValidUser(firebase, "dummy"))
+    await expect(valid(firebase, "dummy"))
         .rejects.toThrow("User: dummy is not exists.");
   });
   it("rejects invalid account.", async () => {
-    await expect(getValidUser(firebase, "invalid"))
+    await expect(valid(firebase, "invalid"))
         .rejects.toThrow("User: invalid is not valid.");
   });
   it("rejects deleted account.", async () => {
-    await expect(getValidUser(firebase, "deleted"))
+    await expect(valid(firebase, "deleted"))
         .rejects.toThrow("User: deleted has deleted.");
   });
   it("returns valid account.", async () => {
-    const account01 = await getValidUser(firebase, "account01");
+    const account01 = await valid(firebase, "account01");
     expect(account01.id).toEqual("account01");
-    const admin = await getValidUser(firebase, "admin");
+    const admin = await valid(firebase, "admin");
     expect(admin.id).toEqual("admin");
   });
 });
 
-describe("getAdminUser()", () => {
+describe("admin()", () => {
   it("rejects undefined uid.", async () => {
-    await expect(getAdminUser(firebase))
+    await expect(admin(firebase))
         .rejects.toThrow("Param uid is missing.");
   });
   it("rejects uid without doc.", async () => {
-    await expect(getAdminUser(firebase, "dummy"))
+    await expect(admin(firebase, "dummy"))
         .rejects.toThrow("User: dummy is not exists.");
   });
   it("rejects invalid account.", async () => {
-    await expect(getAdminUser(firebase, "invalid"))
+    await expect(admin(firebase, "invalid"))
         .rejects.toThrow("User: invalid is not valid.");
   });
   it("rejects deleted account.", async () => {
-    await expect(getAdminUser(firebase, "deleted"))
+    await expect(admin(firebase, "deleted"))
         .rejects.toThrow("User: deleted has deleted.");
   });
   it("rejects account without admin priv.", async () => {
-    await expect(getAdminUser(firebase, "account01"))
+    await expect(admin(firebase, "account01"))
         .rejects.toThrow("User: account01 is not admin.");
   });
   it("returns valid account with admin priv.", async () => {
-    const admin = await getAdminUser(firebase, "admin");
-    expect(admin.id).toEqual("admin");
+    const account = await admin(firebase, "admin");
+    expect(account.id).toEqual("admin");
   });
 });

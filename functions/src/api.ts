@@ -2,7 +2,7 @@ import {Express} from "express";
 import {app} from "firebase-admin";
 import {updateVersion, installer, install} from "./setup";
 
-const initApi = (firebase: app.App, httpApi: Express): Express => {
+const init = (firebase: app.App, httpApi: Express): Express => {
   const db = firebase.firestore();
 
   httpApi.get("/setup", async (req, res) => {
@@ -32,5 +32,5 @@ const initApi = (firebase: app.App, httpApi: Express): Express => {
 };
 
 export {
-  initApi,
+  init,
 };
