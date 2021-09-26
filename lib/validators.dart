@@ -13,11 +13,11 @@ validateRequired(String? value) => value != null && value.isNotEmpty;
 validateEmail(String? value) =>
     value == null || value.isEmpty || regExpEmail.hasMatch(value);
 
-validatePassword(String? value) =>
+validatePasswordChar(String? value) =>
     value == null ||
     value.isEmpty ||
-    (value.length >= 8 &&
-        (!regExpWhiteSpace.hasMatch(value)) &&
+    (
+        //(!regExpWhiteSpace.hasMatch(value)) &&
         ((RegExp(r'[0-9]').hasMatch(value) ? 1 : 0) +
                 (RegExp(r'[A-Z]').hasMatch(value) ? 1 : 0) +
                 (RegExp(r'[a-z]').hasMatch(value) ? 1 : 0) +

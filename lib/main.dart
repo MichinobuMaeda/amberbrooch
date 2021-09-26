@@ -2,7 +2,7 @@ library amberbrooch;
 
 import 'dart:async';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import "package:universal_html/html.dart" as html;
+import "package:universal_html/html.dart";
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -44,7 +44,7 @@ part 'screens/policy.dart';
 part 'screens/preferences.dart';
 
 void main() {
-  String deepLink = html.window.location.href;
+  String deepLink = window.location.href;
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => ThemeModeModel()),

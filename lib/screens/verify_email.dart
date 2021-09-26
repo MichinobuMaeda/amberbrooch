@@ -12,7 +12,6 @@ class VerifyEmailScreen extends BaseScreen {
 
 class _VerifyEmailState extends BaseState {
   Timer? _timer;
-  bool _sendVerificationMail = false;
 
   @override
   void dispose() {
@@ -21,65 +20,74 @@ class _VerifyEmailState extends BaseState {
   }
 
   @override
-  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+  Widget build(BuildContext context) {
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
     AuthUser? authUser = authModel.user;
 
-    return ContentBody([
-      PageTitle(
-        iconData: Icons.email,
-        title: 'メールアドレスの確認',
-        appOutdated: appOutdated,
-        realoadApp: realoadApp,
-      ),
-      FlexRow([
-        Text(
-          '確認のためのメールを ${authUser?.email} に送信します。「送信」ボタンを押してください。',
+    return AppLayout(
+      appOutdated: appOutdated(context),
+      children: [
+        const PageTitle(
+          iconData: Icons.email,
+          title: 'メールアドレスの確認',
         ),
-      ]),
-      if (_sendVerificationMail)
         FlexRow([
           Text(
-            '確認のためのメールを ${authUser?.email} に送信しました。'
-            '受信したメールの確認のためのリンクをクリックしてください。',
+            '確認のためのメールを ${authUser?.email} に送信します。「送信」ボタンを押してください。',
           ),
         ]),
-      FlexRow([
-        PrimaryButton(
-          iconData: Icons.send,
-          label: '送信',
-          onPressed: () {
-            auth.currentUser!.sendEmailVerification();
-            setState(() {
-              _sendVerificationMail = true;
-            });
-            _timer = Timer.periodic(
-              const Duration(seconds: 1),
-              (timer) async {
-                await authModel.reload();
-                AuthUser? authUser = authModel.user;
-                // debugPrint('${authUser?.emailVerified}');
-                if (authUser?.emailVerified == true) {
-                  _timer?.cancel();
-                  _timer = null;
-                }
-              },
-            );
-          },
-        ),
-      ]),
-      const FlexRow([
-        Text('やり直す場合はログアウトしてください。'),
-      ]),
-      FlexRow([
-        PrimaryButton(
-          iconData: Icons.logout,
-          label: 'ログアウト',
-          onPressed: () async {
-            await auth.signOut();
-          },
-        ),
-      ]),
-    ]);
+        FlexRow([
+          PrimaryButton(
+            iconData: Icons.send,
+            label: '送信',
+            onPressed: () async {
+              try {
+                await auth.currentUser!.sendEmailVerification();
+                _timer = Timer.periodic(
+                  const Duration(seconds: 1),
+                  (timer) async {
+                    await authModel.reload();
+                    AuthUser? authUser = authModel.user;
+                    if (authUser?.emailVerified == true) {
+                      _timer?.cancel();
+                      _timer = null;
+                    }
+                  },
+                );
+                showNotificationSnackBar(
+                  context: context,
+                  message: '確認のためのメールを ${authUser?.email} に送信しました。'
+                      '受信したメールの確認のためのリンクをクリックしてください。',
+                );
+              } catch (e) {
+                showNotificationSnackBar(
+                  context: context,
+                  message: 'メール送信の処理でエラーになりました。'
+                      'やり直しても解決しない場合は管理者にお伝えください。',
+                );
+              }
+            },
+          ),
+        ]),
+        const FlexRow([
+          Text(
+            'メールが届かない場合は念のためメールアドレスをご確認ください。'
+            '携帯電話事業者のアドレスの場合は受信拒否の設定をご確認ください。',
+          )
+        ]),
+        const FlexRow([
+          Text('やり直す場合はログアウトしてください。'),
+        ]),
+        FlexRow([
+          PrimaryButton(
+            iconData: Icons.logout,
+            label: 'ログアウト',
+            onPressed: () async {
+              await auth.signOut();
+            },
+          ),
+        ]),
+      ],
+    );
   }
 }

@@ -12,23 +12,24 @@ class TopScreen extends BaseScreen {
 
 class _TopState extends BaseState {
   @override
-  Widget buildBody(BuildContext context, BoxConstraints constraints) {
-    return ContentBody([
-      PageTitle(
-        iconData: Icons.home,
-        title: appTitle,
-        appOutdated: appOutdated,
-        realoadApp: realoadApp,
-      ),
-      FlexRow([
-        PrimaryButton(
-          iconData: Icons.settings,
-          label: 'アプリの情報と設定',
-          onPressed: () {
-            widget.pushRoute(AppRoutePath.preferences());
-          },
+  Widget build(BuildContext context) {
+    return AppLayout(
+      appOutdated: appOutdated(context),
+      children: [
+        PageTitle(
+          iconData: Icons.home,
+          title: appTitle,
         ),
-      ]),
-    ]);
+        FlexRow([
+          PrimaryButton(
+            iconData: Icons.settings,
+            label: 'アプリの情報と設定',
+            onPressed: () {
+              widget.pushRoute(AppRoutePath.preferences());
+            },
+          ),
+        ]),
+      ],
+    );
   }
 }

@@ -13,42 +13,13 @@ abstract class BaseScreen extends StatefulWidget {
 }
 
 abstract class BaseState extends State<BaseScreen> {
-  Widget buildBody(BuildContext context, BoxConstraints constraints);
-  bool appOutdated = false;
-
-  @override
-  Widget build(BuildContext context) {
+  bool appOutdated(BuildContext context) {
     Version? ver = Provider.of<VersionModel>(context, listen: false).version;
     PackageInfo? packageInfo =
         Provider.of<ClientModel>(context, listen: false).packageInfo;
-    appOutdated = ver != null &&
+    return ver != null &&
         packageInfo != null &&
         (ver.version != packageInfo.version ||
             ver.buildNumber != packageInfo.buildNumber);
-
-    return Scaffold(
-      appBar: Header(
-        context: context,
-        pushRoute: widget.pushRoute,
-        appTitle: appTitle,
-      ),
-      body: LayoutBuilder(builder: (
-        BuildContext context,
-        BoxConstraints constraints,
-      ) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(12.0),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - kToolbarHeight,
-                maxWidth: maxContentBodyWidth,
-              ),
-              child: buildBody(context, constraints),
-            ),
-          ),
-        );
-      }),
-    );
   }
 }

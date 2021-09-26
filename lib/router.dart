@@ -80,6 +80,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
   void _handlePush(AppRoutePath path) {
     _name = path.name;
     _id = path.id;
+
     notifyListeners();
   }
 
@@ -90,17 +91,24 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
   @override
   Future<void> setNewRoutePath(AppRoutePath configuration) async {
     if (_state == AppState.authenticated ||
+        configuration.name == AppRoutePath.top().name ||
+        configuration.name == AppRoutePath.preferences().name ||
         configuration.name == AppRoutePath.policy().name) {
       _name = configuration.name;
       _id = configuration.id;
     } else {
       _name = AppRoutePath.top().name;
       _id = null;
+
+      LocalStorage().pageName = configuration.name;
+      LocalStorage().pageId = configuration.id ?? '';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    pushRoute = _handlePush;
+
     return Consumer<VersionModel>(
       builder: (context, versionModel, child) {
         return Consumer<AuthModel>(
@@ -109,7 +117,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
             Provider.of<AccountsModel>(context, listen: false).listen(
               authUser?.id,
               realoadApp,
-              signOut,
+              authModel.signOut,
               Provider.of<MeModel>(context, listen: false),
               Provider.of<GroupsModel>(context, listen: false),
               Provider.of<GroupModel>(context, listen: false),
@@ -122,8 +130,12 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
             } else if (authUser.email != null &&
                 authUser.emailVerified != true) {
               _state = AppState.verifying;
-            } else {
+            } else if (_state != AppState.authenticated) {
               _state = AppState.authenticated;
+              _name = LocalStorage().pageName;
+              _id = LocalStorage().pageId;
+              LocalStorage().pageName = '';
+              LocalStorage().pageId = '';
             }
 
             return Navigator(

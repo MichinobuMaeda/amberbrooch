@@ -12,7 +12,10 @@ class FirebaseModel extends ChangeNotifier {
   bool _initialized = false;
   bool _error = false;
 
-  void init({required String deepLink}) async {
+  void init({
+    required String deepLink,
+    required AuthModel authModel,
+  }) async {
     debugPrint('firebase: init()');
     try {
       if (useEmulator) {
@@ -26,24 +29,16 @@ class FirebaseModel extends ChangeNotifier {
       _initialized = true;
       debugPrint('firebase: initialized');
 
-      String? email = html.window.localStorage['amberbrooch_email'];
-      html.window.localStorage['amberbrooch_email'] = '';
+      String email = LocalStorage().email;
+      LocalStorage().email = '';
 
       debugPrint(deepLink);
       debugPrint(email);
       if (auth.isSignInWithEmailLink(deepLink)) {
-        if (RegExp(r'reauthenticate=yes').hasMatch(deepLink)) {
-          // AuthCredential credential = EmailAuthProvider.credentialWithLink(
-          //     email: email ?? '', emailLink: deepLink);
-          // _tempCredential = await auth.currentUser
-          //     ?.reauthenticateWithCredential(credential);
-          // appContents = AppContents.me;
-        } else {
-          await auth.signInWithEmailLink(
-            email: email ?? '',
-            emailLink: deepLink,
-          );
-        }
+        await authModel.signInWithEmailLink(
+          email: email,
+          deepLink: deepLink,
+        );
       }
 
       notifyListeners();

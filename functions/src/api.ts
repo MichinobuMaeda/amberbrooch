@@ -14,8 +14,8 @@ const initApi = (firebase: app.App, httpApi: Express): Express => {
   });
 
   httpApi.post("/setup", async (req, res) => {
-    const conf = await db.collection("service").doc("conf").get();
-    if (conf && conf.exists) {
+    const ver = await db.collection("service").doc("version").get();
+    if (ver && ver.exists) {
       return res.sendStatus(406); // Not Acceptable
     }
     const {name, email, password, url, requestUrl} = req.body;

@@ -53,7 +53,7 @@ class AccountsModel extends ChangeNotifier {
               Account account = _castDoc(change.doc);
               list.add(account);
               if (change.doc.id == uid) {
-                _setMe(meModel, account, notify);
+                _setMe(meModel, account, notify, signOut);
               }
 
               break;
@@ -62,13 +62,13 @@ class AccountsModel extends ChangeNotifier {
               Account account = _castDoc(change.doc);
               list.add(account);
               if (change.doc.id == uid) {
-                _setMe(meModel, account, notify);
+                _setMe(meModel, account, notify, signOut);
               }
               break;
             case DocumentChangeType.removed:
               list.removeWhere((doc) => doc.id == change.doc.id);
               if (change.doc.id == uid) {
-                _setMe(meModel, null, notify);
+                _setMe(meModel, null, notify, signOut);
               }
               break;
           }
@@ -82,10 +82,10 @@ class AccountsModel extends ChangeNotifier {
         if (doc.exists) {
           Account account = _castDoc(doc);
           list.replaceRange(0, list.length, [account]);
-          _setMe(meModel, account, notify);
+          _setMe(meModel, account, notify, signOut);
         } else {
           list.clear();
-          _setMe(meModel, null, notify);
+          _setMe(meModel, null, notify, signOut);
         }
         debugPrint('Accounts updated (not admin)');
         notifyListeners();
@@ -93,7 +93,7 @@ class AccountsModel extends ChangeNotifier {
     }
   }
 
-  void _setMe(MeModel meModel, Account? me, Function notify) {
+  void _setMe(MeModel meModel, Account? me, Function notify, Function signOut) {
     if (meModel.me != me) {
       if (me == null) {
         debugPrint('accounts: me is null');

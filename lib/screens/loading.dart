@@ -13,36 +13,56 @@ class LoadingScreen extends BaseScreen {
 class _LoadingState extends BaseState {
   @override
   void initState() {
+    super.initState();
     ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
     clientModel.setPackageInfo();
     Provider.of<FirebaseModel>(context, listen: false).init(
-      deepLink: clientModel.deepLink,
-    );
-    super.initState();
+        deepLink: clientModel.deepLink,
+        authModel: Provider.of<AuthModel>(context, listen: false));
   }
 
   @override
-  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+  Widget build(BuildContext context) {
     return Consumer<FirebaseModel>(
       builder: (context, firebase, child) {
         if (!firebase.initialized) {
           if (!firebase.error) {
-            return LoadingStatus(
-              message: '接続の準備をしています。',
-              appOutdated: appOutdated,
-              realoadApp: realoadApp,
-            );
-          } else {
-            return LoadingStatus(
-              message: '接続の設定のエラーです。',
-              color: Theme.of(context).errorColor,
-              appOutdated: appOutdated,
-              subsequents: const <Widget>[
-                Text('管理者に連絡してください。'),
+            return AppLayout(
+              centering: true,
+              loading: true,
+              appOutdated: appOutdated(context),
+              children: const [
+                SizedBox(height: fontSizeBody * 3),
+                FlexRow([
+                  Text(
+                    '接続の準備をしています。',
+                    style: TextStyle(
+                      fontSize: fontSizeH4,
+                    ),
+                  ),
+                ]),
               ],
-              realoadApp: realoadApp,
             );
           }
+
+          return AppLayout(
+            appOutdated: appOutdated(context),
+            children: const [
+              SizedBox(height: fontSizeBody * 3),
+              FlexRow([
+                Text(
+                  '接続の設定のエラーです。',
+                  style: TextStyle(
+                    color: colorDanger,
+                    fontSize: fontSizeH4,
+                  ),
+                ),
+              ]),
+              FlexRow([
+                Text('管理者に連絡してください。'),
+              ]),
+            ],
+          );
         }
 
         AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
@@ -54,21 +74,42 @@ class _LoadingState extends BaseState {
         versionModel.listen();
 
         if (!versionModel.initialized) {
-          return LoadingStatus(
-            message: 'システムの情報を取得しています。',
-            appOutdated: appOutdated,
-            realoadApp: realoadApp,
+          return AppLayout(
+            centering: true,
+            loading: true,
+            appOutdated: appOutdated(context),
+            children: const [
+              SizedBox(height: fontSizeBody * 3),
+              FlexRow([
+                Text(
+                  'システムの情報を取得しています。',
+                  style: TextStyle(
+                    fontSize: fontSizeH4,
+                  ),
+                ),
+              ]),
+            ],
           );
         }
 
-        return LoadingStatus(
-          message: 'システムの情報が取得できませんでした。',
-          color: Theme.of(context).errorColor,
-          appOutdated: appOutdated,
-          subsequents: const <Widget>[
-            Text('管理者に連絡してください。'),
+        return AppLayout(
+          centering: true,
+          appOutdated: appOutdated(context),
+          children: const [
+            SizedBox(height: fontSizeBody * 3),
+            FlexRow([
+              Text(
+                'システムの情報が取得できませんでした。',
+                style: TextStyle(
+                  color: colorDanger,
+                  fontSize: fontSizeH4,
+                ),
+              ),
+            ]),
+            FlexRow([
+              Text('管理者に連絡してください。'),
+            ]),
           ],
-          realoadApp: realoadApp,
         );
       },
     );

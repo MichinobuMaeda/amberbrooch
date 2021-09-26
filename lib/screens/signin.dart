@@ -10,173 +10,194 @@ class SignInScreen extends BaseScreen {
   _SignInState createState() => _SignInState();
 }
 
+enum SignInMethods { emailLink, emailPasrowd }
+
 class _SignInState extends BaseState {
-  final GlobalKey<FormState> _formKeyEmail = GlobalKey<FormState>();
-  final GlobalKey<FormState> _keyEmail = GlobalKey<FormState>();
-  final GlobalKey<FormState> _keyPassword = GlobalKey<FormState>();
-  String? _email;
-  String? _password;
-  bool passwordVisible = false;
-  bool _sendEmailLink = false;
-  bool _errorEmailLink = false;
-  bool _errorEmailAndPassword = false;
+  SignInMethods _signInMethods = SignInMethods.emailLink;
+  final GlobalKey<FormState> _formEmailKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _passwordController = TextEditingController(
+    text: '',
+  );
+  bool _passwordVisible = false;
 
   @override
-  Widget buildBody(BuildContext context, BoxConstraints constraints) {
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
     ConfModel confModel = Provider.of<ConfModel>(context, listen: false);
     Conf? conf = confModel.conf;
 
-    return ContentBody([
-      PageTitle(
-        iconData: Icons.login,
-        title: 'ログイン',
-        appOutdated: appOutdated,
-        realoadApp: realoadApp,
-      ),
-      FlexRow([
-        PrimaryButton(
-          iconData: Icons.settings,
-          label: 'アプリの情報と設定',
-          onPressed: () {
-            widget.pushRoute(AppRoutePath.preferences());
-          },
+    return AppLayout(
+      appOutdated: appOutdated(context),
+      children: [
+        const PageTitle(
+          iconData: Icons.login,
+          title: 'ログイン',
         ),
-      ]),
-      Form(
-          key: _formKeyEmail,
-          autovalidateMode: AutovalidateMode.always,
+        FlexRow([
+          PrimaryButton(
+            iconData: Icons.settings,
+            label: 'アプリの情報と設定',
+            onPressed: () {
+              widget.pushRoute(AppRoutePath.preferences());
+            },
+          ),
+        ]),
+        FlexRow([
+          const Text('ログイン方法を選択してください。'),
+          RadioList<SignInMethods>(
+            options: const {
+              SignInMethods.emailLink: 'メールでログイン用のリンクを受け取る。',
+              SignInMethods.emailPasrowd: 'メールアドレスとパスワードでログインする。',
+            },
+            groupValue: _signInMethods,
+            onChanged: (SignInMethods? value) {
+              setState(() {
+                _signInMethods = value ?? SignInMethods.emailLink;
+              });
+            },
+          ),
+        ]),
+        Form(
+          key: _formEmailKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Wrap(children: [
             FlexRow([
               SizedBox(
                 width: maxContentBodyWidth / 2,
                 child: TextFormField(
-                  key: _keyEmail,
-                  initialValue: _email,
+                  controller: _emailController,
+                  style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   decoration: const InputDecoration(
                     label: Text('メールアドレス'),
                   ),
-                  validator: (String? value) =>
-                      validateEmail(value) ? null : '正しい書式のメールアドレスを記入してください。',
-                  onChanged: (String? value) {
-                    setState(() {
-                      _email = value ?? '';
-                      _sendEmailLink = false;
-                      _errorEmailLink = false;
-                      _errorEmailAndPassword = false;
-                    });
-                  },
+                  validator: (String? value) => validateRequired(value)
+                      ? (validateEmail(value)
+                          ? null
+                          : '正しい書式のメールアドレスを記入してください。')
+                      : 'メールアドレスを記入してください。',
                   autofocus: true,
                 ),
               ),
-              PrimaryButton(
-                iconData: Icons.email,
-                label: 'メールでログイン用のリンクを受け取る',
-                disabled: !(validateRequired(_email) && validateEmail(_email)),
-                onPressed: () async {
-                  try {
-                    await auth.sendSignInLinkToEmail(
-                      email: _email ?? '',
-                      actionCodeSettings: ActionCodeSettings(
-                        url: conf!.url,
-                        handleCodeInApp: true,
-                      ),
-                    );
-                    html.window.localStorage['amberbrooch_email'] =
-                        _email ?? '';
-                    setState(() {
-                      _sendEmailLink = true;
-                    });
-                  } catch (e) {
-                    setState(() {
-                      _errorEmailLink = true;
-                    });
-                  }
-                },
-              ),
+              if (_signInMethods == SignInMethods.emailLink)
+                Padding(
+                  padding: const EdgeInsets.only(top: fontSizeBody),
+                  child: SendMailButton(
+                    onPressed: () async {
+                      String email = _emailController.text;
+                      if (!_formEmailKey.currentState!.validate()) {
+                        showNotificationSnackBar(
+                          context: context,
+                          message: '入力エラーがあります。',
+                        );
+                      } else {
+                        try {
+                          await authModel.sendSignInLinkToEmail(
+                            email: email,
+                            url: conf!.url,
+                          );
+                          showNotificationSnackBar(
+                            context: context,
+                            durationMilliSec: 10 * 1000,
+                            message: 'ログイン用のリンクを $email に送信しました。'
+                                '受信したメールのリンクをクリックしてください。',
+                          );
+                        } catch (e) {
+                          showNotificationSnackBar(
+                            context: context,
+                            message: 'メール送信の処理でエラーになりました。'
+                                'やり直しても解決しない場合は管理者にお伝えください。',
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ),
             ], alignment: WrapAlignment.end),
-            FlexRow(_errorEmailLink
-                ? [
-                    Text(
-                      'エラー：メールアドレスを確認してください。うまくいかない場合は管理者に連絡してください。',
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  ]
-                : _sendEmailLink
-                    ? [
-                        const Text(kIsWeb
-                            ? 'ログイン用のリンクを記載したメールを送信しました。このページを閉じてください。'
-                            : 'ログイン用のリンクを記載したメールを送信しました。')
-                      ]
-                    : []),
-            FlexRow([
-              SizedBox(
-                width: maxContentBodyWidth / 2,
-                child: TextFormField(
-                  key: _keyPassword,
-                  initialValue: _password,
-                  obscureText: !passwordVisible,
-                  decoration: InputDecoration(
-                    label: const Text('パスワード'),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          passwordVisible = !passwordVisible;
-                        });
-                      },
+            if (_signInMethods == SignInMethods.emailPasrowd)
+              FlexRow([
+                SizedBox(
+                  width: maxContentBodyWidth / 2,
+                  child: TextFormField(
+                    controller: _passwordController,
+                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                    obscureText: !_passwordVisible,
+                    validator: (String? value) =>
+                        validateRequired(value) ? null : 'パスワードを記入してください。',
+                    decoration: InputDecoration(
+                      label: const Text('パスワード'),
+                      suffixIcon: VisibilityIconButton(
+                        visible: _passwordVisible,
+                        onPressed: () {
+                          setState(() {
+                            _passwordVisible = !_passwordVisible;
+                          });
+                        },
+                      ),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _password = value ?? '';
-                      _sendEmailLink = false;
-                      _errorEmailLink = false;
-                      _errorEmailAndPassword = false;
-                    });
-                  },
                 ),
-              ),
-              PrimaryButton(
-                iconData: Icons.lock_open,
-                label: 'メールアドレスとパスワードでログイン',
-                disabled: !(validateRequired(_email) &&
-                    validateEmail(_email) &&
-                    validateRequired(_password)),
-                onPressed: () async {
-                  try {
-                    await auth.signInWithEmailAndPassword(
-                      email: _email ?? '',
-                      password: _password ?? '',
-                    );
-                  } catch (e) {
-                    setState(() {
-                      _errorEmailAndPassword = true;
-                    });
-                  }
-                },
-              ),
-            ], alignment: WrapAlignment.end),
-            FlexRow(_errorEmailAndPassword
-                ? [
-                    Text(
-                      'エラー：メールアドレスとパスワードを確認してください。うまくいかない場合は管理者に連絡してください。',
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  ]
-                : []),
-          ])),
-      if (useEmulator)
-        FlexRow([
-          TextButton(
-            child: const Text('Test'),
-            onPressed: () async {
-              await auth.signInWithEmailAndPassword(
-                email: testEmail,
-                password: testPassword,
-              );
-            },
-          ),
-        ])
-    ]);
+                Padding(
+                  padding: const EdgeInsets.only(top: fontSizeBody),
+                  child: PrimaryButton(
+                    iconData: Icons.lock_open,
+                    label: 'ログイン',
+                    onPressed: () async {
+                      String email = _emailController.text;
+                      String password = _passwordController.text;
+                      if (!_formEmailKey.currentState!.validate()) {
+                        showNotificationSnackBar(
+                          context: context,
+                          message: '入力エラーがあります。',
+                        );
+                      } else {
+                        try {
+                          await authModel.signInWithEmailAndPassword(
+                            email: email,
+                            password: password,
+                          );
+                        } catch (e) {
+                          showNotificationSnackBar(
+                            context: context,
+                            message: 'ログインの処理でエラーになりました。'
+                                'メールアドレスとパスワードを確認してください。'
+                                'やり直しても解決しない場合は管理者にお伝えください。',
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ], alignment: WrapAlignment.end),
+          ]),
+        ),
+        const FlexRow([
+          Text('入力したメールアドレスに間違いがないかご確認ください。'),
+          Text('携帯電話事業者のアドレスの場合は受信拒否の設定をご確認ください。'),
+          Text('どのログイン方法でもうまくいかない場合は、管理者にご連絡ください。'),
+        ]),
+        if (useEmulator)
+          FlexRow([
+            TextButton(
+              child: const Text('Test'),
+              onPressed: () async {
+                await auth.signInWithEmailAndPassword(
+                  email: testEmail,
+                  password: testPassword,
+                );
+              },
+            ),
+          ])
+      ],
+    );
   }
 }
