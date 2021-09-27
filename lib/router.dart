@@ -115,64 +115,80 @@ class AppRouterDelegate extends RouterDelegate<AppRoutePath>
           builder: (context, authModel, child) {
             AuthUser? authUser = authModel.user;
             Provider.of<AccountsModel>(context, listen: false).listen(
-              authUser?.id,
+              db,
               realoadApp,
-              authModel.signOut,
+              authModel,
               Provider.of<MeModel>(context, listen: false),
               Provider.of<GroupsModel>(context, listen: false),
               Provider.of<GroupModel>(context, listen: false),
             );
-
-            if (versionModel.version == null) {
-              _state = AppState.loading;
-            } else if (authUser == null) {
-              _state = AppState.guest;
-            } else if (authUser.email != null &&
-                authUser.emailVerified != true) {
-              _state = AppState.verifying;
-            } else if (_state != AppState.authenticated) {
-              _state = AppState.authenticated;
-              _name = LocalStorage().pageName;
-              _id = LocalStorage().pageId;
-              LocalStorage().pageName = '';
-              LocalStorage().pageId = '';
-            }
-
-            return Navigator(
-              key: navigatorKey,
-              pages: [
-                MaterialPage(
-                  key: const ValueKey('HomePage'),
-                  child: _state == AppState.authenticated
-                      ? TopScreen(pushRoute: _handlePush)
-                      : (_state == AppState.verifying
-                          ? VerifyEmailScreen(pushRoute: _handlePush)
-                          : (_state == AppState.guest
-                              ? SignInScreen(pushRoute: _handlePush)
-                              : LoadingScreen(pushRoute: _handlePush))),
-                ),
-                if (_name == AppRoutePath.preferences().name ||
-                    _name == AppRoutePath.policy().name)
-                  PreferencesPage(pushRoute: _handlePush),
-                if (_name == AppRoutePath.policy().name)
-                  PolicyPage(pushRoute: _handlePush)
-              ],
-              onPopPage: (route, result) {
-                if (!route.didPop(result)) {
-                  return false;
+            return Consumer<MeModel>(
+              builder: (context, meModel, child) {
+                if (versionModel.version == null) {
+                  _state = AppState.loading;
+                } else if (authUser == null ||
+                    meModel.me == null ||
+                    meModel.me?.valid == false ||
+                    meModel.me?.deletedAt != null) {
+                  _state = AppState.guest;
+                } else if (authUser.email != null &&
+                    authUser.emailVerified != true) {
+                  _state = AppState.verifying;
+                } else if (_state != AppState.authenticated) {
+                  _state = AppState.authenticated;
+                  _name = LocalStorage().pageName;
+                  _id = LocalStorage().pageId;
+                  LocalStorage().pageName = '';
+                  LocalStorage().pageId = '';
                 }
 
-                if (_name == AppRoutePath.policy().name) {
-                  _name = AppRoutePath.preferences().name;
-                  _id = null;
-                } else {
-                  _name = AppRoutePath.top().name;
-                  _id = null;
-                }
+                final Version? version = versionModel.version;
+                final String ver =
+                    '${version?.version}+${version?.buildNumber}';
+                debugPrint('$ver ${meModel.me?.hashCode}');
+                final String keySuffix = '$ver ${meModel.me?.hashCode}';
 
-                notifyListeners();
+                return Navigator(
+                  key: navigatorKey,
+                  pages: [
+                    MaterialPage(
+                      key: ValueKey('HomePage $keySuffix'),
+                      child: _state == AppState.authenticated
+                          ? const TopScreen()
+                          : (_state == AppState.verifying
+                              ? const VerifyEmailScreen()
+                              : (_state == AppState.guest
+                                  ? const SignInScreen()
+                                  : const LoadingScreen())),
+                    ),
+                    if (_name == AppRoutePath.preferences().name ||
+                        _name == AppRoutePath.policy().name)
+                      PreferencesPage(
+                        key: ValueKey('PreferencesPage $keySuffix'),
+                      ),
+                    if (_name == AppRoutePath.policy().name)
+                      PolicyPage(
+                        key: ValueKey('PolicyPage $keySuffix'),
+                      )
+                  ],
+                  onPopPage: (route, result) {
+                    if (!route.didPop(result)) {
+                      return false;
+                    }
 
-                return true;
+                    if (_name == AppRoutePath.policy().name) {
+                      _name = AppRoutePath.preferences().name;
+                      _id = null;
+                    } else {
+                      _name = AppRoutePath.top().name;
+                      _id = null;
+                    }
+
+                    notifyListeners();
+
+                    return true;
+                  },
+                );
               },
             );
           },

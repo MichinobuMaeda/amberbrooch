@@ -3,7 +3,7 @@ part of amberbrooch;
 Function deepCollectionEquality = const DeepCollectionEquality().equals;
 
 void realoadApp() {
-  window.location.reload();
+  html.window.location.reload();
 }
 
 late Function(AppRoutePath) pushRoute;
@@ -32,8 +32,8 @@ class LocalStorage {
   String get pageId => _getValue(_keyPageId);
 
   _setValue(String key, String value) {
-    window.localStorage[key] = value;
+    html.window.localStorage[key] = value;
   }
 
-  String _getValue(String key) => window.localStorage[key] ?? '';
+  String _getValue(String key) => html.window.localStorage[key] ?? '';
 }

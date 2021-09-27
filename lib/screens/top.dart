@@ -1,16 +1,14 @@
 part of amberbrooch;
 
 class TopScreen extends BaseScreen {
-  const TopScreen({
-    Key? key,
-    required pushRoute,
-  }) : super(key: key, pushRoute: pushRoute);
+  const TopScreen({Key? key}) : super(key: key);
 
   @override
-  _TopState createState() => _TopState();
+  TopState createState() => TopState();
 }
 
-class _TopState extends BaseState {
+@visibleForTesting
+class TopState extends BaseState {
   @override
   Widget build(BuildContext context) {
     return AppLayout(
@@ -25,7 +23,7 @@ class _TopState extends BaseState {
             iconData: Icons.settings,
             label: 'アプリの情報と設定',
             onPressed: () {
-              widget.pushRoute(AppRoutePath.preferences());
+              pushRoute(AppRoutePath.preferences());
             },
           ),
         ]),

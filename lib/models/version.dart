@@ -4,7 +4,9 @@ class VersionModel extends ChangeNotifier {
   Version? _ver;
   bool _initialized = false;
 
-  void listen() {
+  void listen(
+    FirebaseFirestore db,
+  ) {
     debugPrint('version: listen()');
     db.collection('service').doc('version').snapshots().listen(
       (doc) {

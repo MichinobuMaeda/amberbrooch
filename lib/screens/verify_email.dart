@@ -1,16 +1,14 @@
 part of amberbrooch;
 
 class VerifyEmailScreen extends BaseScreen {
-  const VerifyEmailScreen({
-    Key? key,
-    required pushRoute,
-  }) : super(key: key, pushRoute: pushRoute);
+  const VerifyEmailScreen({Key? key}) : super(key: key);
 
   @override
-  _VerifyEmailState createState() => _VerifyEmailState();
+  VerifyEmailState createState() => VerifyEmailState();
 }
 
-class _VerifyEmailState extends BaseState {
+@visibleForTesting
+class VerifyEmailState extends BaseState {
   Timer? _timer;
 
   @override

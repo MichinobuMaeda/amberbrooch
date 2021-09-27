@@ -6,8 +6,9 @@ class ClientModel extends ChangeNotifier {
 
   ClientModel(this.deepLink);
 
-  void setPackageInfo() async {
-    _packageInfo = await PackageInfo.fromPlatform();
+  set packageInfo(PackageInfo? packageInfo) {
+    _packageInfo = packageInfo;
+    notifyListeners();
   }
 
   PackageInfo? get packageInfo => _packageInfo;

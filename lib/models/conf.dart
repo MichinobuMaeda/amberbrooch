@@ -3,7 +3,9 @@ part of amberbrooch;
 class ConfModel extends ChangeNotifier {
   Conf? _conf;
 
-  void listen() {
+  void listen(
+    FirebaseFirestore db,
+  ) {
     debugPrint('conf: listen()');
     db.collection('service').doc('conf').snapshots().listen(
       (doc) {

@@ -1,11 +1,8 @@
 part of amberbrooch;
 
 abstract class BaseScreen extends StatefulWidget {
-  final ValueChanged<AppRoutePath> pushRoute;
-
   const BaseScreen({
     Key? key,
-    required this.pushRoute,
   }) : super(key: key);
 
   @override

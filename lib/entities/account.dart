@@ -44,7 +44,7 @@ class Account extends BaseEntity {
       other.invitedAt == invitedAt &&
       other.createdAt == createdAt &&
       other.updatedAt == updatedAt &&
-      other.updatedAt == deletedAt;
+      other.deletedAt == deletedAt;
 
   @override
   int get hashCode => hashValues(

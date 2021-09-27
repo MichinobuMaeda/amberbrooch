@@ -3,9 +3,13 @@ part of amberbrooch;
 class AuthUser {
   final String id;
   String? email;
-  bool? emailVerified = false;
+  final bool emailVerified;
 
-  AuthUser({required this.id, this.email, this.emailVerified});
+  AuthUser({
+    required this.id,
+    this.email,
+    this.emailVerified = false,
+  });
 
   @override
   operator ==(Object other) =>

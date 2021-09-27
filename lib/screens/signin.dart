@@ -1,18 +1,16 @@
 part of amberbrooch;
 
 class SignInScreen extends BaseScreen {
-  const SignInScreen({
-    Key? key,
-    required pushRoute,
-  }) : super(key: key, pushRoute: pushRoute);
+  const SignInScreen({Key? key}) : super(key: key);
 
   @override
-  _SignInState createState() => _SignInState();
+  SignInState createState() => SignInState();
 }
 
 enum SignInMethods { emailLink, emailPasrowd }
 
-class _SignInState extends BaseState {
+@visibleForTesting
+class SignInState extends BaseState {
   SignInMethods _signInMethods = SignInMethods.emailLink;
   final GlobalKey<FormState> _formEmailKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController(
@@ -48,7 +46,7 @@ class _SignInState extends BaseState {
             iconData: Icons.settings,
             label: 'アプリの情報と設定',
             onPressed: () {
-              widget.pushRoute(AppRoutePath.preferences());
+              pushRoute(AppRoutePath.preferences());
             },
           ),
         ]),

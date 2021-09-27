@@ -8,6 +8,8 @@ class AuthModel extends ChangeNotifier {
 
   AuthModel(this._auth);
 
+  FirebaseAuth get auth => _auth;
+
   void listen() {
     debugPrint('auth: listen()');
     _auth.authStateChanges().listen((User? user) {
@@ -16,9 +18,9 @@ class AuthModel extends ChangeNotifier {
   }
 
   Future<void> reload() async {
-    if (auth.currentUser != null) {
-      await auth.currentUser!.reload();
-      _updateUser(auth.currentUser);
+    if (_auth.currentUser != null) {
+      await _auth.currentUser!.reload();
+      _updateUser(_auth.currentUser);
     }
   }
 
@@ -55,7 +57,7 @@ class AuthModel extends ChangeNotifier {
     required String email,
     required String url,
   }) async {
-    await auth.sendSignInLinkToEmail(
+    await _auth.sendSignInLinkToEmail(
       email: email,
       actionCodeSettings: ActionCodeSettings(
         url: url,
@@ -69,7 +71,7 @@ class AuthModel extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    _userCredential = await auth.signInWithEmailAndPassword(
+    _userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -80,7 +82,7 @@ class AuthModel extends ChangeNotifier {
     required String email,
     required String deepLink,
   }) async {
-    _userCredential = await auth.signInWithEmailLink(
+    _userCredential = await _auth.signInWithEmailLink(
       email: email,
       emailLink: deepLink,
     );
@@ -92,7 +94,7 @@ class AuthModel extends ChangeNotifier {
   }) async {
     final String email = _user?.email ?? '';
     final String emailLink = url;
-    await auth.sendSignInLinkToEmail(
+    await _auth.sendSignInLinkToEmail(
       email: email,
       actionCodeSettings: ActionCodeSettings(
         url: emailLink,
@@ -104,26 +106,26 @@ class AuthModel extends ChangeNotifier {
 
   Future<void> reauthenticateWithPassword(String password) async {
     AuthCredential credential = EmailAuthProvider.credential(
-      email: auth.currentUser?.email ?? '',
+      email: _auth.currentUser?.email ?? '',
       password: password,
     );
     _userCredential =
-        await auth.currentUser!.reauthenticateWithCredential(credential);
+        await _auth.currentUser!.reauthenticateWithCredential(credential);
     _authenticatedAt = DateTime.now();
     notifyListeners();
   }
 
   Future<void> setMyEmail(String email) async {
-    await auth.currentUser!.updateEmail(email);
-    await auth.currentUser!.reload();
+    await _auth.currentUser!.updateEmail(email);
+    await _auth.currentUser!.reload();
   }
 
   Future<void> setMyPassword(String password) async {
-    await auth.currentUser!.updatePassword(password);
-    await auth.currentUser!.reload();
+    await _auth.currentUser!.updatePassword(password);
+    await _auth.currentUser!.reload();
   }
 
   Future<void> signOut() async {
-    await auth.signOut();
+    await _auth.signOut();
   }
 }

@@ -1,10 +1,17 @@
 part of amberbrooch;
 
 // Firebase:Development
-const int emulatorPortAuth = 9099;
-const int emulatorPortFirestore = 8080;
-const int emulatorPortStorage = 9199;
-const int emulatorPortFunctions = 5001;
+const bool useEmulator = String.fromEnvironment('EMULATOR') == 'Y';
+
+Future<void> initFirebase(bool useEmulator) async {
+  if (useEmulator) {
+    await auth.useAuthEmulator('localhost', 9099);
+    db.useFirestoreEmulator('localhost', 8080);
+    await storage.useStorageEmulator('localhost', 9199);
+    functions.useFunctionsEmulator('localhost', 5001);
+  }
+  await Firebase.initializeApp();
+}
 
 const String testEmail = 'primary@example.com';
 const String testPassword = 'password';
@@ -12,6 +19,12 @@ const String testPassword = 'password';
 // Firebase
 const String functionsRegion = 'asia-northeast1';
 const int reAuthExpriedMilliSec = 30 * 60 * 1000;
+
+final FirebaseAuth auth = FirebaseAuth.instance;
+final FirebaseFirestore db = FirebaseFirestore.instance;
+final FirebaseStorage storage = FirebaseStorage.instance;
+final FirebaseFunctions functions =
+    FirebaseFunctions.instanceFor(region: functionsRegion);
 
 // Flutter
 String appTitle = 'Amber brooch';

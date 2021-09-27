@@ -29,7 +29,7 @@ class Group extends BaseEntity {
       deepCollectionEquality(other.accounts, accounts) &&
       other.createdAt == createdAt &&
       other.updatedAt == updatedAt &&
-      other.updatedAt == deletedAt;
+      other.deletedAt == deletedAt;
 
   @override
   int get hashCode => hashValues(

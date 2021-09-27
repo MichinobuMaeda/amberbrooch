@@ -8,6 +8,8 @@
   "scripts": {
     "test:conf": "curl -X POST http://localhost:5001/amberbrooch/asia-northeast1/api/setup -H \"Content-Type: application/x-www-form-urlencoded\" -d \"name=Primary%20User&email=primary@example.com&password=password&url=http%3A%2F%2Flocalhost%3A5000%2F\"",
     "test:functions": "firebase emulators:exec --only auth,functions,firestore,storage 'yarn --cwd functions test'",
+    "test:ui": "flutter test --coverage",
+    "test:genhtml": "genhtml coverage/lcov.info -o coverage/html",
     "serve": "firebase emulators:exec --only auth,functions,firestore,storage --ui 'yarn test:conf && flutter run -d chrome --web-port 5000 --dart-define=EMULATOR=Y'",
     "deploy": "firebase deploy"
   },

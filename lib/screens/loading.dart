@@ -1,24 +1,28 @@
 part of amberbrooch;
 
 class LoadingScreen extends BaseScreen {
-  const LoadingScreen({
-    Key? key,
-    required pushRoute,
-  }) : super(key: key, pushRoute: pushRoute);
+  const LoadingScreen({Key? key}) : super(key: key);
 
   @override
-  _LoadingState createState() => _LoadingState();
+  LoadingState createState() => LoadingState();
 }
 
-class _LoadingState extends BaseState {
+@visibleForTesting
+class LoadingState extends BaseState {
   @override
   void initState() {
     super.initState();
     ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
-    clientModel.setPackageInfo();
+    _setPackageInfo(clientModel);
     Provider.of<FirebaseModel>(context, listen: false).init(
-        deepLink: clientModel.deepLink,
-        authModel: Provider.of<AuthModel>(context, listen: false));
+      deepLink: clientModel.deepLink,
+      authModel: Provider.of<AuthModel>(context, listen: false),
+      initFirebase: initFirebase,
+    );
+  }
+
+  Future<void> _setPackageInfo(ClientModel clientModel) async {
+    clientModel.packageInfo = await PackageInfo.fromPlatform();
   }
 
   @override
@@ -70,8 +74,8 @@ class _LoadingState extends BaseState {
         VersionModel versionModel =
             Provider.of<VersionModel>(context, listen: false);
         authModel.listen();
-        confModel.listen();
-        versionModel.listen();
+        confModel.listen(db);
+        versionModel.listen(db);
 
         if (!versionModel.initialized) {
           return AppLayout(
