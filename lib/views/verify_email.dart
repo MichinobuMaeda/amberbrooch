@@ -1,14 +1,19 @@
 part of amberbrooch;
 
-class VerifyEmailScreen extends BaseScreen {
-  const VerifyEmailScreen({Key? key}) : super(key: key);
+class VerifyEmailView extends StatefulWidget {
+  final AuthModel authModel;
+
+  const VerifyEmailView({
+    Key? key,
+    required this.authModel,
+  }) : super(key: key);
 
   @override
   VerifyEmailState createState() => VerifyEmailState();
 }
 
 @visibleForTesting
-class VerifyEmailState extends BaseState {
+class VerifyEmailState extends State<VerifyEmailView> {
   Timer? _timer;
 
   @override
@@ -22,8 +27,8 @@ class VerifyEmailState extends BaseState {
     AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
     AuthUser? authUser = authModel.user;
 
-    return AppLayout(
-      appOutdated: appOutdated(context),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const PageTitle(
           iconData: Icons.email,
@@ -40,16 +45,11 @@ class VerifyEmailState extends BaseState {
             label: '送信',
             onPressed: () async {
               try {
-                await auth.currentUser!.sendEmailVerification();
+                await widget.authModel.sendEmailVerification();
                 _timer = Timer.periodic(
                   const Duration(seconds: 1),
                   (timer) async {
                     await authModel.reload();
-                    AuthUser? authUser = authModel.user;
-                    if (authUser?.emailVerified == true) {
-                      _timer?.cancel();
-                      _timer = null;
-                    }
                   },
                 );
                 showNotificationSnackBar(
@@ -81,7 +81,7 @@ class VerifyEmailState extends BaseState {
             iconData: Icons.logout,
             label: 'ログアウト',
             onPressed: () async {
-              await auth.signOut();
+              await widget.authModel.signOut();
             },
           ),
         ]),

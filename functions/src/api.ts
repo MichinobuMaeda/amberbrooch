@@ -14,7 +14,7 @@ const init = (firebase: app.App, httpApi: Express): Express => {
   });
 
   httpApi.post("/setup", async (req, res) => {
-    const ver = await db.collection("service").doc("version").get();
+    const ver = await db.collection("service").doc("conf").get();
     if (ver && ver.exists) {
       return res.sendStatus(406); // Not Acceptable
     }

@@ -8,24 +8,24 @@ import {createUser} from "./accounts";
 const updateVersion = async (firebase: app.App): Promise<boolean> => {
   const db = firebase.firestore();
 
-  const ver = await db.collection("service").doc("version").get();
-  if (!ver || !ver.exists) {
+  const conf = await db.collection("service").doc("conf").get();
+  if (!conf || !conf.exists) {
     return false;
   }
 
   const res = await axios.get(
-      `${ver.get("url")}version.json?check=${new Date().getTime()}`
+      `${conf.get("url")}version.json?check=${new Date().getTime()}`
   );
   const version = res.data.version;
   const buildNumber = res.data.build_number;
 
   if (
-    (version !== ver.get("version")) ||
-    (buildNumber !== ver.get("buildNumber"))
+    (version !== conf.get("version")) ||
+    (buildNumber !== conf.get("buildNumber"))
   ) {
     logger.info(`${version}+${buildNumber}`);
 
-    await db.collection("service").doc("version").update({
+    await db.collection("service").doc("conf").update({
       version,
       buildNumber,
       updatedAt: new Date(),
@@ -86,14 +86,9 @@ const install = async (
   hash.update(url);
   const seed = hash.digest("hex");
 
-  await db.collection("service").doc("version").set({
+  await db.collection("service").doc("conf").set({
     version: "1.0.0",
     buildNumber: "1",
-    createdAt: ts,
-    updatedAt: ts,
-  });
-
-  await db.collection("service").doc("conf").set({
     url,
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,

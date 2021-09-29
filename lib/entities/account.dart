@@ -30,6 +30,21 @@ class Account extends BaseEntity {
           deletedAt: deletedAt,
         );
 
+  factory Account.fromFirestoreDoc(dynamic doc) => Account(
+        id: doc.id,
+        name: doc.get('name'),
+        group: doc.get('group'),
+        valid: doc.get('valid'),
+        admin: doc.get('admin'),
+        tester: doc.get('tester'),
+        invitation: doc.get('invitation'),
+        invitedBy: doc.get('invitedBy'),
+        invitedAt: doc.get('invitedAt')?.toDate(),
+        createdAt: doc.get('createdAt').toDate(),
+        updatedAt: doc.get('updatedAt').toDate(),
+        deletedAt: doc.get('deletedAt')?.toDate(),
+      );
+
   @override
   operator ==(Object other) =>
       other is Account &&

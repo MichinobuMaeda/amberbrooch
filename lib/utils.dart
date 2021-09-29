@@ -6,8 +6,6 @@ void realoadApp() {
   html.window.location.reload();
 }
 
-late Function(AppRoutePath) pushRoute;
-
 class LocalStorage {
   final _keyEmail = 'amberbrooch_email';
   final _keyPageName = 'amberbrooch_page_name';

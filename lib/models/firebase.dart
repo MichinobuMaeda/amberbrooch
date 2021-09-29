@@ -1,49 +1,42 @@
 part of amberbrooch;
 
 class FirebaseModel extends ChangeNotifier {
-  bool _initialized = false;
-  bool _error = false;
+  bool initialized = false;
+  bool error = false;
 
-  void init({
-    required String deepLink,
+  Future<void> listen({
+    required bool useEmulator,
+    required FirebaseAuth auth,
+    required FirebaseFirestore db,
+    required FirebaseStorage storage,
+    required FirebaseFunctions functions,
     required AuthModel authModel,
-    required Function initFirebase,
+    required ConfModel confModel,
+    required MeModel meModel,
   }) async {
-    debugPrint('firebase: init()');
-    FirebaseAuth auth = authModel.auth;
+    debugPrint('FirebaseModel: listen()');
     try {
-      await initFirebase(useEmulator);
-      auth.setLanguageCode('ja');
-      _initialized = true;
-      debugPrint('firebase: initialized');
-
-      String email = LocalStorage().email;
-      LocalStorage().email = '';
-
-      debugPrint(deepLink);
-      debugPrint(email);
-      if (auth.isSignInWithEmailLink(deepLink)) {
-        await authModel.signInWithEmailLink(
-          email: email,
-          deepLink: deepLink,
-        );
+      if (useEmulator) {
+        await auth.useAuthEmulator('localhost', emulatorPortAuth);
+        db.useFirestoreEmulator('localhost', emulatorPortFirestore);
+        await storage.useStorageEmulator('localhost', emulatorPortStorage);
+        functions.useFunctionsEmulator('localhost', emulatorPortFunctions);
       }
-
-      notifyListeners();
-    } catch (e, s) {
+      await Firebase.initializeApp();
+      initialized = true;
+    } catch (e) {
       if (e.toString().contains('code=failed-precondition')) {
-        _initialized = true;
+        initialized = true;
         debugPrint('firebase: already initialized');
       } else {
-        _error = true;
-        debugPrint('firebase: error');
-        debugPrint('Exception: $e');
-        debugPrint('StackTrace: $s');
+        error = true;
       }
-      notifyListeners();
+    }
+
+    if (initialized) {
+      auth.setLanguageCode('ja');
+      authModel.listen(auth, db, meModel);
+      confModel.listen(db, await PackageInfo.fromPlatform());
     }
   }
-
-  bool get initialized => _initialized;
-  bool get error => _error;
 }

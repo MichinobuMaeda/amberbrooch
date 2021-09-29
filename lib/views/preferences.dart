@@ -1,26 +1,23 @@
 part of amberbrooch;
 
-class PreferencesPage extends Page {
-  const PreferencesPage({LocalKey? key}) : super(key: key);
-
-  @override
-  Route createRoute(BuildContext context) {
-    return MaterialPageRoute(
-      settings: this,
-      builder: (BuildContext context) => const PreferencesScreen(),
-    );
-  }
-}
-
 @visibleForTesting
-class PreferencesScreen extends BaseScreen {
-  const PreferencesScreen({Key? key}) : super(key: key);
+class PreferencesView extends StatefulWidget {
+  final MeModel meModel;
+  final AuthModel authModel;
+  final ThemeModeModel themeModeModel;
+
+  const PreferencesView({
+    Key? key,
+    required this.themeModeModel,
+    required this.authModel,
+    required this.meModel,
+  }) : super(key: key);
 
   @override
   _PreferencesState createState() => _PreferencesState();
 }
 
-class _PreferencesState extends BaseState {
+class _PreferencesState extends State<PreferencesView> {
   final GlobalKey<FormState> _nameFormKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _nameKey = GlobalKey<FormFieldState>();
   final TextEditingController _nameController = TextEditingController();
@@ -53,34 +50,16 @@ class _PreferencesState extends BaseState {
 
   @override
   Widget build(BuildContext context) {
-    ClientModel clientModel = Provider.of<ClientModel>(context, listen: false);
-    AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
-    ThemeModeModel themeModeModel = Provider.of<ThemeModeModel>(context);
-    MeModel meModel = Provider.of<MeModel>(context, listen: false);
-    Account? me = meModel.me;
+    Account? me = widget.meModel.me;
     _nameController.text = me?.name ?? '';
 
-    return AppLayout(
-      appOutdated: appOutdated(context),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const PageTitle(
           iconData: Icons.settings,
           title: 'アプリの情報と設定',
         ),
-        FlexRow([
-          PrimaryButton(
-            iconData: Icons.policy,
-            label: 'プライバシー・ポリシー',
-            onPressed: () {
-              pushRoute(AppRoutePath.policy());
-            },
-          ),
-          ShowAboutButton(
-            context: context,
-            appTitle: appTitle,
-            packageInfo: clientModel.packageInfo,
-          ),
-        ]),
         FlexRow([
           const Padding(
             padding: EdgeInsets.only(top: 12.0),
@@ -94,13 +73,13 @@ class _PreferencesState extends BaseState {
             ],
             onPressed: (int index) {
               setState(() {
-                themeModeModel.mode = themeModes[index];
+                widget.themeModeModel.mode = themeModes[index];
               });
             },
             isSelected: [
-              themeModeModel.mode == themeModes[0],
-              themeModeModel.mode == themeModes[1],
-              themeModeModel.mode == themeModes[2],
+              widget.themeModeModel.mode == themeModes[0],
+              widget.themeModeModel.mode == themeModes[1],
+              widget.themeModeModel.mode == themeModes[2],
             ],
           ),
         ]),
@@ -138,10 +117,7 @@ class _PreferencesState extends BaseState {
                           message: '表示名は変更されていません。',
                         );
                       } else {
-                        await db.collection('accounts').doc(me.id).update({
-                          'name': _nameController.text,
-                          'updatedAt': DateTime.now(),
-                        });
+                        await widget.meModel.setName(_nameController.text);
                         showNotificationSnackBar(
                           context: context,
                           message: '表示名を保存しました。',
@@ -158,11 +134,11 @@ class _PreferencesState extends BaseState {
               ),
             ], alignment: WrapAlignment.end),
           ),
-        if (me != null && !authModel.reAuthed)
+        if (me != null && !widget.authModel.reAuthed)
           const FlexRow([
             Text('メールアドレスとパスワードの変更には、現在のメールアドレスか、または、現在のパスワードの確認が必要です。'),
           ]),
-        if (me != null && !authModel.reAuthed)
+        if (me != null && !widget.authModel.reAuthed)
           FlexRow([
             const SizedBox(
               width: maxContentBodyWidth / 2,
@@ -173,12 +149,14 @@ class _PreferencesState extends BaseState {
                 try {
                   Conf conf =
                       Provider.of<ConfModel>(context, listen: false).conf!;
-                  await authModel.reauthenticateWithEmailLink(url: conf.url);
+                  await widget.authModel
+                      .reauthenticateWithEmailLink(url: conf.url);
                   LocalStorage().pageName = 'preferences';
                   LocalStorage().pageId = '';
                   showNotificationSnackBar(
                     context: context,
-                    message: '確認のためのメールを ${authModel.user?.email} に送信しました。'
+                    message:
+                        '確認のためのメールを ${widget.authModel.user?.email} に送信しました。'
                         '受信したメールの確認のためのリンクをクリックしてください。',
                   );
                 } catch (e) {
@@ -191,7 +169,7 @@ class _PreferencesState extends BaseState {
               },
             ),
           ], alignment: WrapAlignment.end),
-        if (me != null && authModel.reAuthed)
+        if (me != null && widget.authModel.reAuthed)
           Form(
             key: _emailFormKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -243,7 +221,7 @@ class _PreferencesState extends BaseState {
                           );
                         } else {
                           try {
-                            await authModel.setMyEmail(email);
+                            await widget.authModel.setMyEmail(email);
                             showNotificationSnackBar(
                               context: context,
                               durationMilliSec: 10 * 1000,
@@ -269,7 +247,7 @@ class _PreferencesState extends BaseState {
             key: _passwordFormKey,
             autovalidateMode: AutovalidateMode.always,
             child: Wrap(children: [
-              if (authModel.reAuthed)
+              if (widget.authModel.reAuthed)
                 FlexRow([
                   SizedBox(
                     width: maxContentBodyWidth / 2,
@@ -309,7 +287,7 @@ class _PreferencesState extends BaseState {
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     decoration: InputDecoration(
                       label: Text(
-                        authModel.reAuthed ? 'パスワードの確認' : '現在のパスワード',
+                        widget.authModel.reAuthed ? 'パスワードの確認' : '現在のパスワード',
                       ),
                       suffixIcon: VisibilityIconButton(
                         visible: _passwordVisible,
@@ -320,7 +298,7 @@ class _PreferencesState extends BaseState {
                         },
                       ),
                     ),
-                    validator: (String? value) => authModel.reAuthed
+                    validator: (String? value) => widget.authModel.reAuthed
                         ? (_passwordController.text == _password2Controller.text
                             ? null
                             : 'パスワードが一致しません。')
@@ -330,7 +308,7 @@ class _PreferencesState extends BaseState {
                 Padding(
                   padding: const EdgeInsets.only(top: fontSizeBody),
                   child: FlexRow([
-                    authModel.reAuthed
+                    widget.authModel.reAuthed
                         ? SaveButton(
                             onPressed: () async {
                               String password = _passwordController.text;
@@ -341,7 +319,8 @@ class _PreferencesState extends BaseState {
                                 );
                               } else {
                                 try {
-                                  await authModel.setMyPassword(password);
+                                  await widget.authModel
+                                      .setMyPassword(password);
                                   showNotificationSnackBar(
                                     context: context,
                                     durationMilliSec: 10 * 1000,
@@ -362,8 +341,9 @@ class _PreferencesState extends BaseState {
                         : SendButton(
                             onPressed: () async {
                               try {
-                                await authModel.reauthenticateWithPassword(
-                                    _password2Controller.text);
+                                await widget.authModel
+                                    .reauthenticateWithPassword(
+                                        _password2Controller.text);
                                 setState(() {
                                   _password2Controller.text = '';
                                 });
@@ -390,8 +370,7 @@ class _PreferencesState extends BaseState {
                 context: context,
                 message: 'ログアウトしますか？',
                 onPressed: () async {
-                  await authModel.signOut();
-                  pushRoute(AppRoutePath.top());
+                  await widget.authModel.signOut();
                 },
               ),
             ),
