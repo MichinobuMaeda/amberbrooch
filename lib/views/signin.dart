@@ -1,7 +1,14 @@
 part of amberbrooch;
 
-class SignInScreen extends BaseScreen {
-  const SignInScreen({Key? key}) : super(key: key);
+class SignInView extends StatefulWidget {
+  final Conf? conf;
+  final AuthModel authModel;
+
+  const SignInView({
+    Key? key,
+    this.conf,
+    required this.authModel,
+  }) : super(key: key);
 
   @override
   SignInState createState() => SignInState();
@@ -10,7 +17,7 @@ class SignInScreen extends BaseScreen {
 enum SignInMethods { emailLink, emailPasrowd }
 
 @visibleForTesting
-class SignInState extends BaseState {
+class SignInState extends State<SignInView> {
   SignInMethods _signInMethods = SignInMethods.emailLink;
   final GlobalKey<FormState> _formEmailKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController(
@@ -30,26 +37,15 @@ class SignInState extends BaseState {
 
   @override
   Widget build(BuildContext context) {
-    AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
-    ConfModel confModel = Provider.of<ConfModel>(context, listen: false);
-    Conf? conf = confModel.conf;
+    Conf? conf = widget.conf;
 
-    return AppLayout(
-      appOutdated: appOutdated(context),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const PageTitle(
           iconData: Icons.login,
           title: 'ログイン',
         ),
-        FlexRow([
-          PrimaryButton(
-            iconData: Icons.settings,
-            label: 'アプリの情報と設定',
-            onPressed: () {
-              pushRoute(AppRoutePath.preferences());
-            },
-          ),
-        ]),
         FlexRow([
           const Text('ログイン方法を選択してください。'),
           RadioList<SignInMethods>(
@@ -99,7 +95,7 @@ class SignInState extends BaseState {
                         );
                       } else {
                         try {
-                          await authModel.sendSignInLinkToEmail(
+                          await widget.authModel.sendSignInLinkToEmail(
                             email: email,
                             url: conf!.url,
                           );
@@ -159,7 +155,7 @@ class SignInState extends BaseState {
                         );
                       } else {
                         try {
-                          await authModel.signInWithEmailAndPassword(
+                          await widget.authModel.signInWithEmailAndPassword(
                             email: email,
                             password: password,
                           );
@@ -188,9 +184,10 @@ class SignInState extends BaseState {
             TextButton(
               child: const Text('Test'),
               onPressed: () async {
-                await auth.signInWithEmailAndPassword(
+                await widget.authModel.signInWithEmailAndPassword(
                   email: testEmail,
                   password: testPassword,
+                  resetRecord: true,
                 );
               },
             ),

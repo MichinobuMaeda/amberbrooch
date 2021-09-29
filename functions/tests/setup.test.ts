@@ -9,27 +9,20 @@ import {
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const verRef = db.collection("service").doc("version");
 const confRef = db.collection("service").doc("conf");
 const ts = new Date("2020-01-01T00:00:00.000Z");
 
 beforeEach(async () => {
-  await verRef.set({
+  await confRef.set({
     version: "1.0.0",
     buildNumber: "1",
-    createdAt: ts,
-    updatedAt: ts,
-  });
-  await confRef.set({
     url: "http://example.com/version.json",
-    buildNumber: "1",
     createdAt: ts,
     updatedAt: ts,
   });
 });
 
 afterEach(async () => {
-  await verRef.delete();
   await confRef.delete();
 });
 
@@ -45,7 +38,7 @@ describe("updateVersion()", () => {
         build_number: "1",
       },
     });
-    await verRef.delete();
+    await confRef.delete();
     const ret = await updateVersion(firebase);
     expect(ret).toBeFalsy();
   });
@@ -59,8 +52,8 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const ver = await verRef.get();
-    expect(ver.get("updatedAt").toDate()).toEqual(ts);
+    const conf = await confRef.get();
+    expect(conf.get("updatedAt").toDate()).toEqual(ts);
   });
   it("returns true and update conf has old version.", async () => {
     mockedAxios.get.mockResolvedValue({
@@ -71,10 +64,10 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const ver = await verRef.get();
-    expect(ver.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(ver.get("version")).toEqual("1.0.1");
-    expect(ver.get("buildNumber")).toEqual("1");
+    const conf = await confRef.get();
+    expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
+    expect(conf.get("version")).toEqual("1.0.1");
+    expect(conf.get("buildNumber")).toEqual("1");
   });
   it("returns true and update conf has old build_number.", async () => {
     mockedAxios.get.mockResolvedValue({
@@ -85,10 +78,10 @@ describe("updateVersion()", () => {
     });
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
-    const ver = await verRef.get();
-    expect(ver.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(ver.get("version")).toEqual("1.0.0");
-    expect(ver.get("buildNumber")).toEqual("2");
+    const conf = await confRef.get();
+    expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
+    expect(conf.get("version")).toEqual("1.0.0");
+    expect(conf.get("buildNumber")).toEqual("2");
   });
 });
 

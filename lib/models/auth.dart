@@ -1,35 +1,51 @@
 part of amberbrooch;
 
 class AuthModel extends ChangeNotifier {
-  final FirebaseAuth _auth;
+  final String deepLink;
   AuthUser? _user;
   UserCredential? _userCredential;
   DateTime? _authenticatedAt;
+  late FirebaseAuth _auth;
 
-  AuthModel(this._auth);
+  AuthModel(this.deepLink);
 
-  FirebaseAuth get auth => _auth;
+  void listen(
+    FirebaseAuth auth,
+    FirebaseFirestore db,
+    MeModel meModel,
+  ) {
+    debugPrint('AuthModel: listen()');
 
-  void listen() {
-    debugPrint('auth: listen()');
-    _auth.authStateChanges().listen((User? user) {
-      _updateUser(user);
-    });
-  }
+    _auth = auth;
+    String email = LocalStorage().email;
+    LocalStorage().email = '';
 
-  Future<void> reload() async {
-    if (_auth.currentUser != null) {
-      await _auth.currentUser!.reload();
-      _updateUser(_auth.currentUser);
+    debugPrint(deepLink);
+    debugPrint(email);
+    if (auth.isSignInWithEmailLink(deepLink)) {
+      signInWithEmailLink(
+        email: email,
+        deepLink: deepLink,
+      );
+    } else {
+      auth.authStateChanges().listen(
+        (User? user) {
+          setUser(user, db, meModel);
+        },
+      );
     }
   }
 
-  void _updateUser(User? user) {
+  void setUser(
+    User? user,
+    FirebaseFirestore db,
+    MeModel meModel,
+  ) async {
     if (user == null) {
       if (_user != null) {
         _user = null;
-        debugPrint('auth: null');
-        notifyListeners();
+        debugPrint('AuthModel: null');
+        meModel.listen(db, this);
       }
     } else {
       AuthUser provided = AuthUser(
@@ -38,9 +54,14 @@ class AuthModel extends ChangeNotifier {
         emailVerified: user.emailVerified,
       );
       if (_user != provided) {
+        if (_user?.emailVerified != true && provided.emailVerified) {
+          notifyListeners();
+        }
         _user = provided;
-        debugPrint('auth: ' + _user!.id);
-        notifyListeners();
+        debugPrint('AuthModel: ' + _user!.id);
+        if (meModel.me?.id != _user!.id) {
+          meModel.listen(db, this);
+        }
       }
     }
   }
@@ -67,15 +88,24 @@ class AuthModel extends ChangeNotifier {
     LocalStorage().email = email;
   }
 
+  Future<void> sendEmailVerification() async {
+    await _auth.currentUser!.sendEmailVerification();
+  }
+
   Future<void> signInWithEmailAndPassword({
     required String email,
     required String password,
+    bool resetRecord = false,
   }) async {
     _userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
     _authenticatedAt = DateTime.now();
+    if (resetRecord) {
+      _userCredential = null;
+      _authenticatedAt = null;
+    }
   }
 
   Future<void> signInWithEmailLink({
@@ -106,7 +136,7 @@ class AuthModel extends ChangeNotifier {
 
   Future<void> reauthenticateWithPassword(String password) async {
     AuthCredential credential = EmailAuthProvider.credential(
-      email: _auth.currentUser?.email ?? '',
+      email: _auth.currentUser!.email ?? '',
       password: password,
     );
     _userCredential =
@@ -125,7 +155,27 @@ class AuthModel extends ChangeNotifier {
     await _auth.currentUser!.reload();
   }
 
+  Future<void> reload() async {
+    await _auth.currentUser?.reload();
+    if (_auth.currentUser == null) {
+      return;
+    }
+    AuthUser provided = AuthUser(
+      id: _auth.currentUser!.uid,
+      email: _auth.currentUser!.email,
+      emailVerified: _auth.currentUser!.emailVerified,
+    );
+    if (_user != provided) {
+      if (_user?.emailVerified != true && provided.emailVerified) {
+        notifyListeners();
+      }
+      _user = provided;
+    }
+  }
+
   Future<void> signOut() async {
+    _userCredential = null;
+    _authenticatedAt = null;
     await _auth.signOut();
   }
 }

@@ -10,7 +10,7 @@ import {
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const verRef = db.collection("service").doc("version");
+const confRef = db.collection("service").doc("conf");
 const ts = new Date("2020-01-01T00:00:00.000Z");
 
 afterAll(async () => {
@@ -18,7 +18,7 @@ afterAll(async () => {
 });
 
 describe("get: /setup", () => {
-  it("send the installer if document 'ver' is not exists.", async () => {
+  it("send the installer if document 'conf' is not exists.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
     const request = supertest(init(firebase, app));
@@ -27,8 +27,8 @@ describe("get: /setup", () => {
     expect(response.status).toBe(200);
     expect(response.text).toMatch("<h1>Install</h1>");
   });
-  it("send text 'OK' if document 'ver' is exists.", async () => {
-    await verRef.set({
+  it("send text 'OK' if document 'conf' is exists.", async () => {
+    await confRef.set({
       version: "1.0.0",
       buildNumber: "1",
       createdAt: ts,
@@ -50,12 +50,12 @@ describe("get: /setup", () => {
     expect(response.status).toBe(200);
     expect(response.text).toEqual("OK");
 
-    await verRef.delete();
+    await confRef.delete();
   });
 });
 
 describe("post: /setup", () => {
-  it("send text 'OK' if document 'version' is not exists " +
+  it("send text 'OK' if document 'conf' is not exists " +
       "for request without requestUrl.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -70,9 +70,9 @@ describe("post: /setup", () => {
     expect(response.status).toBe(200);
     expect(response.text).toEqual("OK");
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 302 if document 'version' is not exists " +
+  it("send status 302 if document 'conf' is not exists " +
       "for request with requestUrl.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -87,9 +87,9 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(302);
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 400 if document 'version' is not exists " +
+  it("send status 400 if document 'conf' is not exists " +
       "for request without name.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -104,9 +104,9 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(400);
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 400 if document 'version' is not exists " +
+  it("send status 400 if document 'conf' is not exists " +
       "for request without email.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -121,9 +121,9 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(400);
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 400 if document 'version' is not exists " +
+  it("send status 400 if document 'conf' is not exists " +
       "for request without password.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -138,9 +138,9 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(400);
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 400 if document 'version' is not exists " +
+  it("send status 400 if document 'conf' is not exists " +
       "for request without url.", async () => {
     const app = express();
     app.use(express.urlencoded({extended: true}));
@@ -155,10 +155,10 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(400);
 
-    await verRef.delete();
+    await confRef.delete();
   });
-  it("send status 406 if document 'version' is exists.", async () => {
-    await verRef.set({
+  it("send status 406 if document 'conf' is exists.", async () => {
+    await confRef.set({
       version: "1.0.0",
       buildNumber: "1",
       createdAt: ts,
@@ -172,6 +172,6 @@ describe("post: /setup", () => {
 
     expect(response.status).toBe(406);
 
-    await verRef.delete();
+    await confRef.delete();
   });
 });
