@@ -1,5 +1,11 @@
 # Creating this project
 
+Install the reriquisites in ["Development" page](creproj.md).
+
+```
+$ npm -g install firebase-tools
+```
+
 https://console.firebase.google.com/
 
 - Add project
@@ -17,7 +23,7 @@ https://console.firebase.google.com/
         - Support email: my address
     - Usage and billing
         - Detailes & settings
-            - Modify plan: Blaze 
+            - Modify plan: Blaze
 - Authentication
     - Sign-in providers
         - Email/Password: Enable

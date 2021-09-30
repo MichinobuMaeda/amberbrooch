@@ -28,7 +28,7 @@ jobs:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
 
-      - run: yarn install && yarn --cwd functions install --frozen-lockfile
+      - run: yarn install --frozen-lockfile && yarn --cwd functions install --frozen-lockfile
       - run: yarn test:functions
       - uses: subosito/flutter-action@v1
         with:
