@@ -65,7 +65,6 @@ describe("createUser()", () => {
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeFalsy();
     expect(doc.get("valid")).toBeTruthy();
-    expect(doc.get("group")).toBeNull();
     const account = await auth.getUser(uid);
     expect(account.displayName).toEqual(name);
     expect(account.email).not.toBeDefined();
@@ -87,7 +86,6 @@ describe("createUser()", () => {
     expect(doc.get("admin")).toBeTruthy();
     expect(doc.get("tester")).toBeFalsy();
     expect(doc.get("valid")).toBeTruthy();
-    expect(doc.get("group")).toEqual(group);
     const account = await auth.getUser(uid);
     expect(account.displayName).toEqual(name);
     expect(account.email).not.toBeDefined();
@@ -112,7 +110,6 @@ describe("createUser()", () => {
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeTruthy();
     expect(doc.get("valid")).toBeTruthy();
-    expect(doc.get("group")).toEqual(group);
     const account = await auth.getUser(uid);
     expect(account.displayName).toEqual(name);
     expect(account.email).toEqual(email);
@@ -138,7 +135,6 @@ describe("createUser()", () => {
     expect(doc.get("admin")).toBeFalsy();
     expect(doc.get("tester")).toBeTruthy();
     expect(doc.get("valid")).toBeTruthy();
-    expect(doc.get("group")).toEqual(group);
     const account = await auth.getUser(uid);
     expect(account.displayName).toEqual(name);
     expect(account.email).toEqual(email);

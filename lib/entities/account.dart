@@ -2,7 +2,6 @@ part of amberbrooch;
 
 class Account extends BaseEntity {
   final String name;
-  String? group;
   final bool valid;
   final bool admin;
   final bool tester;
@@ -13,7 +12,6 @@ class Account extends BaseEntity {
   Account({
     required String id,
     required this.name,
-    this.group,
     required this.valid,
     required this.admin,
     required this.tester,
@@ -33,7 +31,6 @@ class Account extends BaseEntity {
   factory Account.fromFirestoreDoc(dynamic doc) => Account(
         id: doc.id,
         name: doc.get('name'),
-        group: doc.get('group'),
         valid: doc.get('valid'),
         admin: doc.get('admin'),
         tester: doc.get('tester'),
@@ -50,7 +47,6 @@ class Account extends BaseEntity {
       other is Account &&
       other.id == id &&
       other.name == name &&
-      other.group == group &&
       other.valid == valid &&
       other.admin == admin &&
       other.tester == tester &&
@@ -65,7 +61,6 @@ class Account extends BaseEntity {
   int get hashCode => hashValues(
         id,
         name,
-        group,
         valid,
         admin,
         tester,

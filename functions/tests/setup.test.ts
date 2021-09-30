@@ -107,7 +107,6 @@ describe("install()", () => {
     expect(primary.get("admin")).toBeTruthy();
     expect(primary.get("tester")).toBeTruthy();
     expect(primary.get("valid")).toBeTruthy();
-    expect(primary.get("group")).toEqual("testers");
     const account = await auth.getUser(uid);
     expect(account.displayName).toEqual(name);
     expect(account.email).toEqual(email);

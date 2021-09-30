@@ -35,7 +35,6 @@ const createAccount = async (
     admin,
     tester,
     valid: true,
-    group: group || null,
     invitation: null,
     invitedBy: null,
     invitedAt: null,
