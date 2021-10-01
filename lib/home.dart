@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   HomeState createState() => HomeState();
 }
 
-enum View { home, settings }
+enum View { home, settings, policy }
 
 class HomeState extends State<HomePage> {
   View _view = View.home;
@@ -30,36 +30,48 @@ class HomeState extends State<HomePage> {
                     ThemeModeModel themeModeModel =
                         Provider.of<ThemeModeModel>(context, listen: false);
 
+                    Map<View, Widget> body = {
+                      View.home: LoadingView(
+                        firebaseModel: firebaseModel,
+                        versionModel: confModel,
+                        child: meModel.me == null
+                            ? ScrollView(
+                                child: SignInView(
+                                  conf: confModel.conf,
+                                  authModel: authModel,
+                                ),
+                              )
+                            : authModel.user?.emailVerified == false
+                                ? ScrollView(
+                                    child: VerifyEmailView(
+                                      authModel: authModel,
+                                    ),
+                                  )
+                                : const ScrollView(
+                                    child: TopView(),
+                                  ),
+                      ),
+                      View.settings: ScrollView(
+                        child: PreferencesView(
+                          themeModeModel: themeModeModel,
+                          confModel: confModel,
+                          authModel: authModel,
+                          meModel: meModel,
+                        ),
+                      ),
+                      View.policy: ScrollView(
+                        child: PolicyView(
+                          confModel: confModel,
+                          me: meModel.me,
+                        ),
+                      ),
+                    };
+
+                    Color? colorActive(bool condition) =>
+                        condition ? colorActiveView : null;
+
                     return Scaffold(
-                      body: _view == View.settings
-                          ? ScrollView(
-                              child: PreferencesView(
-                                themeModeModel: themeModeModel,
-                                confModel: confModel,
-                                authModel: authModel,
-                                meModel: meModel,
-                              ),
-                            )
-                          : LoadingView(
-                              firebaseModel: firebaseModel,
-                              versionModel: confModel,
-                              child: meModel.me == null
-                                  ? ScrollView(
-                                      child: SignInView(
-                                        conf: confModel.conf,
-                                        authModel: authModel,
-                                      ),
-                                    )
-                                  : authModel.user?.emailVerified == false
-                                      ? ScrollView(
-                                          child: VerifyEmailView(
-                                            authModel: authModel,
-                                          ),
-                                        )
-                                      : const ScrollView(
-                                          child: TopView(),
-                                        ),
-                            ),
+                      body: body[_view],
                       bottomNavigationBar: BottomAppBar(
                         child: Wrap(
                           alignment: WrapAlignment.spaceEvenly,
@@ -69,8 +81,7 @@ class HomeState extends State<HomePage> {
                             IconButton(
                               icon: Icon(
                                 Icons.home,
-                                color:
-                                    _view == View.home ? colorActiveView : null,
+                                color: colorActive(_view == View.home),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -81,9 +92,7 @@ class HomeState extends State<HomePage> {
                             IconButton(
                               icon: Icon(
                                 Icons.settings,
-                                color: _view == View.settings
-                                    ? colorActiveView
-                                    : null,
+                                color: colorActive(_view == View.settings),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -91,29 +100,44 @@ class HomeState extends State<HomePage> {
                                 });
                               },
                             ),
-                            if (confModel.outdated)
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: fontSizeBody / 8,
-                                  ),
-                                  child: DangerButton(
-                                    iconData: Icons.system_update,
-                                    label: 'アプリを更新してください',
-                                    onPressed: () {
-                                      realoadApp();
-                                    },
-                                  )),
-                            if (useEmulator)
-                              const Text(
+                            IconButton(
+                              icon: Icon(
+                                Icons.policy,
+                                color: colorActive(_view == View.policy),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _view = View.policy;
+                                });
+                              },
+                            ),
+                            Visibility(
+                              visible: confModel.outdated,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: fontSizeBody / 8,
+                                ),
+                                child: DangerButton(
+                                  iconData: Icons.system_update,
+                                  label: 'アプリを更新してください',
+                                  onPressed: () {
+                                    realoadApp();
+                                  },
+                                ),
+                              ),
+                            ),
+                            const Visibility(
+                              visible: useEmulator,
+                              child: Text(
                                 'エミュレータを使用しています。'
                                 '実世界のアカウントとデータを入力しないで下さい。'
                                 'この行は Production 環境では表示されません。',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                            ),
                           ],
                         ),
-                        // ),
                       ),
                     );
                   },

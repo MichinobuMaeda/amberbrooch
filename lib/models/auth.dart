@@ -30,13 +30,13 @@ class AuthModel extends ChangeNotifier {
         email: email,
         deepLink: deepLink,
       );
-    } else {
-      auth.authStateChanges().listen(
-        (User? user) {
-          setUser(user, db, meModel);
-        },
-      );
     }
+
+    auth.authStateChanges().listen(
+      (User? user) {
+        setUser(user, db, meModel);
+      },
+    );
   }
 
   void setUser(

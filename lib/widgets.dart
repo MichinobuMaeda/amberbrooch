@@ -270,19 +270,21 @@ class FlexRow extends Widget {
   final List<Widget> children;
   final WrapAlignment alignment;
   final WrapAlignment runAlignment;
+  final bool? visible;
 
-  const FlexRow(
-    this.children, {
+  const FlexRow({
     Key? key,
+    required this.children,
     this.spacing = fontSizeBody / 2,
     this.runSpacing = fontSizeBody / 2,
     this.alignment = WrapAlignment.start,
     this.runAlignment = WrapAlignment.start,
+    this.visible,
   }) : super(key: key);
 
   @override
   Element createElement() {
-    return Padding(
+    Widget row = Padding(
       padding: const EdgeInsets.only(bottom: fontSizeBody * 1.5),
       child: Wrap(
         spacing: spacing,
@@ -291,7 +293,14 @@ class FlexRow extends Widget {
         runAlignment: runAlignment,
         children: children,
       ),
-    ).createElement();
+    );
+    return (visible == null
+            ? row
+            : Visibility(
+                visible: visible!,
+                child: row,
+              ))
+        .createElement();
   }
 }
 
@@ -307,9 +316,11 @@ class PageTitle extends Widget {
 
   @override
   Element createElement() {
-    return FlexRow([
-      Icon(iconData, size: fontSizeH2 * 1.4),
-      Text(title, style: const TextStyle(fontSize: fontSizeH2)),
-    ]).createElement();
+    return FlexRow(
+      children: [
+        Icon(iconData, size: fontSizeH2 * 1.4),
+        Text(title, style: const TextStyle(fontSize: fontSizeH2)),
+      ],
+    ).createElement();
   }
 }

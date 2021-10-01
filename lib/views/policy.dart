@@ -51,8 +51,9 @@ class PolicyState extends State<PolicyView> {
           iconData: Icons.policy,
           title: 'プライバシー・ポリシー',
         ),
-        if (widget.me?.admin == true && !_editMode)
-          Row(
+        Visibility(
+          visible: widget.me?.admin == true && !_editMode,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
@@ -65,8 +66,11 @@ class PolicyState extends State<PolicyView> {
               )
             ],
           ),
-        if (widget.me?.admin == true && _editMode)
-          FlexRow([
+        ),
+        FlexRow(
+          alignment: WrapAlignment.end,
+          visible: widget.me?.admin == true && _editMode,
+          children: [
             SaveButton(
               onPressed: () async {
                 _editMode = false;
@@ -88,11 +92,11 @@ class PolicyState extends State<PolicyView> {
               autofocus: true,
               style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             ),
-          ], alignment: WrapAlignment.end),
-        if (widget.me?.admin != true || !_editMode)
-          // Expanded(
-          // child:
-          MarkdownBody(
+          ],
+        ),
+        Visibility(
+          visible: widget.me?.admin != true || !_editMode,
+          child: MarkdownBody(
             key: _keyMarkdown,
             selectable: true,
             data: conf?.policy ?? '',
@@ -112,7 +116,7 @@ class PolicyState extends State<PolicyView> {
               }
             },
           ),
-        // ),
+        ),
       ],
     );
   }
