@@ -73,7 +73,7 @@ const installer = `<!DOCTYPE html>
     <h1>Install</h1>
     <form action="" method="POST">
       <div>Url:</div>
-      <p><input type="text" name="url" value="https://amber-cabinet.web.app/"
+      <p><input type="text" name="url" value="https://amberbrooch.web.app/"
         style="width: 100%; max-width: 480px;" /></p>
       <div>Name:</div>
       <p><input type="text" name="name"

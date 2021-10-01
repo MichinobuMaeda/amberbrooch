@@ -113,3 +113,7 @@ https://github.com/MichinobuMaeda/amberbrooch
 - Settings
     - Secrets
         - FIREBASE_TOKEN_AMBERBROOCH: 1//...
+
+deploy and open https://asia-northeast1-amberbrooch.cloudfunctions.net/api/setup
+
+open https://amberbrooch.web.app/
