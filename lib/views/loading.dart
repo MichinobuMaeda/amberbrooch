@@ -2,13 +2,13 @@ part of amberbrooch;
 
 class LoadingView extends StatelessWidget {
   final FirebaseModel firebaseModel;
-  final ConfModel versionModel;
+  final ConfModel confModel;
   final Widget child;
 
   const LoadingView({
     Key? key,
     required this.firebaseModel,
-    required this.versionModel,
+    required this.confModel,
     required this.child,
   }) : super(key: key);
 
@@ -44,7 +44,7 @@ class LoadingView extends StatelessWidget {
                 ),
               ],
             )
-          : versionModel.error
+          : confModel.error
               ? const Center(
                   child: Text(
                     'システムの情報を取得できませんでした。',
@@ -54,7 +54,7 @@ class LoadingView extends StatelessWidget {
                     ),
                   ),
                 )
-              : !versionModel.initialized
+              : !confModel.initialized
                   ? Column(
                       children: const [
                         LinearProgressIndicator(

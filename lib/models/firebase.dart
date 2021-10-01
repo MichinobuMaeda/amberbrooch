@@ -34,6 +34,8 @@ class FirebaseModel extends ChangeNotifier {
       }
     }
 
+    notifyListeners();
+
     if (initialized) {
       auth.setLanguageCode('ja');
       authModel.listen(auth, db, meModel, themeModeModel);

@@ -33,7 +33,7 @@ class HomeState extends State<HomePage> {
                     Map<View, Widget> body = {
                       View.home: LoadingView(
                         firebaseModel: firebaseModel,
-                        versionModel: confModel,
+                        confModel: confModel,
                         child: meModel.me == null
                             ? ScrollView(
                                 child: SignInView(
