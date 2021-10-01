@@ -1,12 +1,13 @@
 import {Express} from "express";
 import {app} from "firebase-admin";
-import {updateVersion, installer, install} from "./setup";
+import {updateVersion, updateData, installer, install} from "./setup";
 
 const init = (firebase: app.App, httpApi: Express): Express => {
   const db = firebase.firestore();
 
   httpApi.get("/setup", async (req, res) => {
     if (await updateVersion(firebase)) {
+      await updateData(firebase);
       return res.send("OK");
     } else {
       return res.send(installer);
@@ -23,6 +24,8 @@ const init = (firebase: app.App, httpApi: Express): Express => {
       return res.sendStatus(400); // Bad Request
     }
     const result = await install(firebase, name, email, password, url);
+    await updateData(firebase);
+
     return requestUrl ?
       res.redirect(requestUrl) :
       res.send(result);

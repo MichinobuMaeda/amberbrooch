@@ -35,6 +35,33 @@ const updateVersion = async (firebase: app.App): Promise<boolean> => {
   return true;
 };
 
+const updateData = async (firebase: app.App): Promise<boolean> => {
+  const db = firebase.firestore();
+
+  const conf = await db.collection("service").doc("conf").get();
+  if (!conf || !conf.exists) {
+    return false;
+  }
+
+  const dataVersion = conf.get("dataVersion") || 0;
+
+  if (dataVersion < 1) {
+    const accounts = await db.collection("accounts").get();
+    await Promise.all(accounts.docs.map(async (doc) => {
+      await doc.ref.update({
+        themeMode: doc.get("themeMode") || null,
+      });
+    }));
+  }
+
+  await db.collection("service").doc("conf").update({
+    dataVersion: 1,
+    updatedAt: new Date(),
+  });
+
+  return true;
+};
+
 const installer = `<!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -157,6 +184,7 @@ The quick brown fox jumps over the lazy dog.
 
 export {
   updateVersion,
+  updateData,
   installer,
   install,
 };

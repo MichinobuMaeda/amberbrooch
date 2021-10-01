@@ -2,6 +2,8 @@ part of amberbrooch;
 
 const String appTitle = 'Amber brooch';
 const String copyRight = '© 2021 Michinobu Maeda.';
+const String licenseNotice =
+    'This product is distributed under the Apache License Version 2.0.';
 
 const ThemeMode defaultThemeMode = ThemeMode.light;
 

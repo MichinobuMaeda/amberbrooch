@@ -27,3 +27,33 @@ export const createUser = functions.region(REGION)
           data.tester ?? false
       );
     });
+
+export const setUserName = functions.region(REGION)
+    .https.onCall(async (data, context) => {
+      await guard.admin(firebase, context.auth?.uid);
+      await accounts.setUserName(
+          firebase,
+          data.uid ?? "",
+          data.name ?? "",
+      );
+    });
+
+export const setUserEmail = functions.region(REGION)
+    .https.onCall(async (data, context) => {
+      await guard.admin(firebase, context.auth?.uid);
+      await accounts.setUserName(
+          firebase,
+          data.uid ?? "",
+          data.email ?? "",
+      );
+    });
+
+export const setUserPassword = functions.region(REGION)
+    .https.onCall(async (data, context) => {
+      await guard.admin(firebase, context.auth?.uid);
+      await accounts.setUserName(
+          firebase,
+          data.uid ?? "",
+          data.password ?? "",
+      );
+    });

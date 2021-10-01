@@ -72,6 +72,7 @@ class App extends StatelessWidget {
       authModel: Provider.of<AuthModel>(context, listen: false),
       confModel: Provider.of<ConfModel>(context, listen: false),
       meModel: Provider.of<MeModel>(context, listen: false),
+      themeModeModel: Provider.of<ThemeModeModel>(context, listen: false),
     );
 
     return Consumer<ThemeModeModel>(

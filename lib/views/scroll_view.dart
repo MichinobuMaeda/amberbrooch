@@ -16,8 +16,8 @@ class ScrollView extends StatelessWidget {
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
+              constraints: const BoxConstraints(
+                // minHeight: constraints.maxHeight - 16.0,
                 maxWidth: maxContentBodyWidth,
                 minWidth: maxContentBodyWidth,
               ),

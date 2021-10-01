@@ -32,9 +32,10 @@ const createAccount = async (
 
   const account = await db.collection("accounts").add({
     name,
+    valid: true,
     admin,
     tester,
-    valid: true,
+    themeMode: null, // dataVersion: 1
     invitation: null,
     invitedBy: null,
     invitedAt: null,

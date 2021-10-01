@@ -3,12 +3,14 @@ part of amberbrooch;
 @visibleForTesting
 class PreferencesView extends StatefulWidget {
   final MeModel meModel;
+  final ConfModel confModel;
   final AuthModel authModel;
   final ThemeModeModel themeModeModel;
 
   const PreferencesView({
     Key? key,
     required this.themeModeModel,
+    required this.confModel,
     required this.authModel,
     required this.meModel,
   }) : super(key: key);
@@ -74,6 +76,7 @@ class _PreferencesState extends State<PreferencesView> {
             onPressed: (int index) {
               setState(() {
                 widget.themeModeModel.mode = themeModes[index];
+                widget.meModel.setThemeMode(widget.themeModeModel.mode);
               });
             },
             isSelected: [
@@ -375,6 +378,26 @@ class _PreferencesState extends State<PreferencesView> {
               ),
             ),
           ]),
+        FlexRow([
+          TextButton(
+            child: const Text('Copyright'),
+            onPressed: () => showAboutDialog(
+              useRootNavigator: false,
+              context: context,
+              applicationIcon: const Image(
+                image: AssetImage('images/logo.png'),
+                width: fontSizeBody * 3,
+                height: fontSizeBody * 3,
+              ),
+              applicationName: appTitle,
+              applicationVersion: widget.confModel.version,
+              children: [
+                const Text(copyRight),
+                const Text(licenseNotice),
+              ],
+            ),
+          ),
+        ]),
       ],
     );
   }

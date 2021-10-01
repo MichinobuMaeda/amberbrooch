@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   HomeState createState() => HomeState();
 }
 
-enum View { home, settings, policy }
+enum View { home, settings }
 
 class HomeState extends State<HomePage> {
   View _view = View.home;
@@ -35,37 +35,31 @@ class HomeState extends State<HomePage> {
                           ? ScrollView(
                               child: PreferencesView(
                                 themeModeModel: themeModeModel,
+                                confModel: confModel,
                                 authModel: authModel,
                                 meModel: meModel,
                               ),
                             )
-                          : _view == View.policy
-                              ? ScrollView(
-                                  child: PolicyView(
-                                    confModel: confModel,
-                                    me: meModel.me,
-                                  ),
-                                )
-                              : LoadingView(
-                                  firebaseModel: firebaseModel,
-                                  versionModel: confModel,
-                                  child: meModel.me == null
+                          : LoadingView(
+                              firebaseModel: firebaseModel,
+                              versionModel: confModel,
+                              child: meModel.me == null
+                                  ? ScrollView(
+                                      child: SignInView(
+                                        conf: confModel.conf,
+                                        authModel: authModel,
+                                      ),
+                                    )
+                                  : authModel.user?.emailVerified == false
                                       ? ScrollView(
-                                          child: SignInView(
-                                            conf: confModel.conf,
+                                          child: VerifyEmailView(
                                             authModel: authModel,
                                           ),
                                         )
-                                      : authModel.user?.emailVerified == false
-                                          ? ScrollView(
-                                              child: VerifyEmailView(
-                                                authModel: authModel,
-                                              ),
-                                            )
-                                          : const ScrollView(
-                                              child: TopView(),
-                                            ),
-                                ),
+                                      : const ScrollView(
+                                          child: TopView(),
+                                        ),
+                            ),
                       bottomNavigationBar: BottomAppBar(
                         child: Wrap(
                           alignment: WrapAlignment.spaceEvenly,
@@ -96,40 +90,6 @@ class HomeState extends State<HomePage> {
                                   _view = View.settings;
                                 });
                               },
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.policy,
-                                color: _view == View.policy
-                                    ? colorActiveView
-                                    : null,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _view = View.policy;
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.copyright),
-                              onPressed: () => showAboutDialog(
-                                useRootNavigator: false,
-                                context: context,
-                                applicationIcon: const Image(
-                                  image: AssetImage('images/logo.png'),
-                                  width: fontSizeBody * 3,
-                                  height: fontSizeBody * 3,
-                                ),
-                                applicationName: appTitle,
-                                applicationVersion: confModel.version,
-                                children: [
-                                  const Text(
-                                    copyRight,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  )
-                                ],
-                              ),
                             ),
                             if (confModel.outdated)
                               Padding(

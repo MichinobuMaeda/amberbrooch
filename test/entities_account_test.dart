@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:amberbrooch/main.dart';
 
@@ -11,6 +12,7 @@ void main() {
       valid: true,
       admin: false,
       tester: false,
+      // themeMode: ThemeMode.light,
       // invitation: null,
       // invitedBy: null,
       // invitedAt: null,
@@ -24,6 +26,7 @@ void main() {
     expect(account.valid, true);
     expect(account.admin, false);
     expect(account.tester, false);
+    expect(account.themeMode, ThemeMode.light);
     expect(account.invitation, null);
     expect(account.invitedBy, null);
     expect(account.invitedAt, null);
@@ -56,6 +59,7 @@ void main() {
     expect(account.valid, true);
     expect(account.admin, false);
     expect(account.tester, false);
+    expect(account.themeMode, ThemeMode.light);
     expect(account.invitation, null);
     expect(account.invitedBy, null);
     expect(account.invitedAt, null);
@@ -71,6 +75,7 @@ void main() {
       valid: true,
       admin: false,
       tester: false,
+      themeMode: ThemeMode.dark,
       createdAt: DateTime.fromMillisecondsSinceEpoch(msec + 1),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(msec + 2),
     );
@@ -80,6 +85,7 @@ void main() {
       valid: true,
       admin: false,
       tester: false,
+      themeMode: ThemeMode.dark,
       createdAt: DateTime.fromMillisecondsSinceEpoch(msec + 1),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(msec + 2),
     );
@@ -88,36 +94,3 @@ void main() {
     expect(account01.hashCode == account02.hashCode, true);
   });
 }
-
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
-
-// import 'package:amberbrooch/main.dart';
-
-// void main() {
-//   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // final TopState topState = tester.state(find.byType(TopScreen));
-
-    // // Build our app and trigger a frame.
-    // await tester.pumpWidget(App());
-
-    // // Verify that our counter starts at 0.
-    // expect(find.text('0'), findsOneWidget);
-    // expect(find.text('1'), findsNothing);
-
-    // // Tap the '+' icon and trigger a frame.
-    // await tester.tap(find.byIcon(Icons.add));
-    // await tester.pump();
-
-    // // Verify that our counter has incremented.
-    // expect(find.text('0'), findsNothing);
-    // expect(find.text('1'), findsOneWidget);
-//   });
-// }

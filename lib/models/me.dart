@@ -3,15 +3,18 @@ part of amberbrooch;
 class MeModel extends ChangeNotifier {
   dynamic _sub;
   Account? _me;
+  late ThemeModeModel _themeModeModel;
   late FirebaseFirestore _db;
 
   void listen(
     FirebaseFirestore db,
     AuthModel authModel,
+    ThemeModeModel themeModeModel,
   ) {
     debugPrint('MeModel: listen()');
 
     _db = db;
+    _themeModeModel = themeModeModel;
     _sub?.cancel();
     if (authModel.user == null) {
       me = null;
@@ -44,6 +47,9 @@ class MeModel extends ChangeNotifier {
   set me(Account? me) {
     if (_me != me) {
       _me = me;
+      if (me != null) {
+        _themeModeModel.mode = me.themeMode;
+      }
       debugPrint('me: ${me?.id}');
       notifyListeners();
     }
@@ -52,8 +58,25 @@ class MeModel extends ChangeNotifier {
   Account? get me => _me;
 
   Future<void> setName(String text) async {
+    if (_me == null) {
+      return;
+    }
     await _db.collection('accounts').doc(_me!.id).update({
       'name': text,
+      'updatedAt': DateTime.now(),
+    });
+  }
+
+  Future<void> setThemeMode(ThemeMode themeMode) async {
+    if (_me == null) {
+      return;
+    }
+    await _db.collection('accounts').doc(_me!.id).update({
+      'themeMode': themeMode == ThemeMode.system
+          ? 'system'
+          : themeMode == ThemeMode.dark
+              ? 'dark'
+              : 'light',
       'updatedAt': DateTime.now(),
     });
   }

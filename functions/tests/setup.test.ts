@@ -3,6 +3,7 @@ import axios from "axios";
 import {firebase, db, auth} from "./config";
 import {
   updateVersion,
+  updateData,
   install,
 } from "../src/setup";
 
@@ -82,6 +83,70 @@ describe("updateVersion()", () => {
     expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
     expect(conf.get("version")).toEqual("1.0.0");
     expect(conf.get("buildNumber")).toEqual("2");
+  });
+});
+
+describe("updateData()", () => {
+  it("return false for uninitialized database.", async () => {
+    await confRef.delete();
+    const ret = await updateData(firebase);
+    expect(ret).toBeFalsy();
+  });
+  const latestDataVersion = 1;
+  it("set dataVsersion.", async () => {
+    const ret = await updateData(firebase);
+    expect(ret).toBeTruthy();
+    const conf = await confRef.get();
+    expect(conf.get("dataVersion")).toEqual(latestDataVersion);
+  });
+  it("do nothing for latest dataVersion.", async () => {
+    await updateData(firebase);
+    const ret0 = await updateData(firebase);
+    expect(ret0).toBeTruthy();
+    const conf0 = await confRef.get();
+    expect(conf0.get("dataVersion")).toEqual(latestDataVersion);
+  });
+  // for dataVersion: latest - 1
+  // for dataVersion: latest - 2
+  // ...
+  // for dataVersion: 2
+  // for dataVersion: 1
+  it("add accounts 'themeMode' for dataVersion: 0.", async () => {
+    await confRef.update({
+      dataVersion: 0,
+    });
+    const account01Ref = db.collection("accounts").doc("account01");
+    const account02Ref = db.collection("accounts").doc("account02");
+    await account01Ref.set({
+      valid: true,
+      name: "Account 1",
+      admin: true,
+      tester: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    await account02Ref.set({
+      valid: true,
+      name: "Account 2",
+      admin: true,
+      tester: true,
+      themeMode: "dark",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const ret = await updateData(firebase);
+
+    expect(ret).toBeTruthy();
+    const conf = await confRef.get();
+    expect(conf.get("dataVersion")).toEqual(1);
+    const account01 = await account01Ref.get();
+    const account02 = await account02Ref.get();
+    expect(account01.get("themeMode")).toBeNull();
+    expect(account02.get("themeMode")).toEqual("dark");
+
+    await account01Ref.delete();
+    await account02Ref.delete();
   });
 });
 

@@ -5,6 +5,7 @@ class Account extends BaseEntity {
   final bool valid;
   final bool admin;
   final bool tester;
+  final ThemeMode themeMode;
   final String? invitation;
   final String? invitedBy;
   final DateTime? invitedAt;
@@ -15,6 +16,7 @@ class Account extends BaseEntity {
     required this.valid,
     required this.admin,
     required this.tester,
+    this.themeMode = ThemeMode.light,
     this.invitation,
     this.invitedBy,
     this.invitedAt,
@@ -34,6 +36,11 @@ class Account extends BaseEntity {
         valid: doc.get('valid'),
         admin: doc.get('admin'),
         tester: doc.get('tester'),
+        themeMode: doc.get('themeMode') == 'system'
+            ? ThemeMode.system
+            : doc.get('themeMode') == 'dark'
+                ? ThemeMode.dark
+                : ThemeMode.light,
         invitation: doc.get('invitation'),
         invitedBy: doc.get('invitedBy'),
         invitedAt: doc.get('invitedAt')?.toDate(),
@@ -50,6 +57,7 @@ class Account extends BaseEntity {
       other.valid == valid &&
       other.admin == admin &&
       other.tester == tester &&
+      other.themeMode == themeMode &&
       other.invitation == invitation &&
       other.invitedBy == invitedBy &&
       other.invitedAt == invitedAt &&
@@ -64,6 +72,7 @@ class Account extends BaseEntity {
         valid,
         admin,
         tester,
+        themeMode,
         invitation,
         invitedBy,
         invitedAt,
