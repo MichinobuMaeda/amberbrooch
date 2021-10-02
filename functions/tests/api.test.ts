@@ -38,7 +38,7 @@ describe("get: /setup", () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.0",
-        build_number: "1",
+        buildNumber: "1",
       },
     });
 

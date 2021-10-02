@@ -37,8 +37,10 @@ jobs:
       - run: flutter pub get
       - run: yarn test:ci
       - run: flutter build web
+      - run: dart run setver.dart
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_AMBERBROOCH }}'
           projectId: amberbrooch
+      - run: curl https://asia-northeast1-amberbrooch.cloudfunctions.net/api/setup

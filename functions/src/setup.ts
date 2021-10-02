@@ -17,7 +17,7 @@ const updateVersion = async (firebase: app.App): Promise<boolean> => {
       `${conf.get("url")}version.json?check=${new Date().getTime()}`
   );
   const version = res.data.version;
-  const buildNumber = res.data.build_number;
+  const buildNumber = res.data.buildNumber;
 
   if (
     (version !== conf.get("version")) ||
