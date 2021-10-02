@@ -40,11 +40,13 @@ part 'widgets.dart';
 void main() {
   String deepLink = html.window.location.href;
   LocalStore localStore = WebClientLocalStore();
+  bool useEmulator = html.window.location.href.startsWith('http://');
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ClientModel(localStore)),
-        ChangeNotifierProvider(create: (context) => FirebaseModel()),
+        ChangeNotifierProvider(create: (context) => FirebaseModel(useEmulator)),
         ChangeNotifierProvider(create: (context) => AuthModel(deepLink)),
         ChangeNotifierProvider(create: (context) => ConfModel()),
         ChangeNotifierProvider(create: (context) => MeModel()),
@@ -66,7 +68,6 @@ class App extends StatelessWidget {
         FirebaseFunctions.instanceFor(region: functionsRegion);
 
     Provider.of<FirebaseModel>(context, listen: false).listen(
-      useEmulator: useEmulator,
       auth: auth,
       db: db,
       storage: storage,

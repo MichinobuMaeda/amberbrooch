@@ -1,11 +1,13 @@
 part of amberbrooch;
 
 class FirebaseModel extends ChangeNotifier {
+  final bool useEmulator;
   bool initialized = false;
   bool error = false;
 
+  FirebaseModel(this.useEmulator);
+
   Future<void> listen({
-    required bool useEmulator,
     required FirebaseAuth auth,
     required FirebaseFirestore db,
     required FirebaseStorage storage,

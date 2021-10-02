@@ -3,7 +3,6 @@ part of amberbrooch;
 class AuthModel extends ChangeNotifier {
   final String deepLink;
   AuthUser? _user;
-  UserCredential? _userCredential;
   DateTime? _authenticatedAt;
   late FirebaseAuth _auth;
   late ClientModel _clientModel;
@@ -37,10 +36,6 @@ class AuthModel extends ChangeNotifier {
         setUser(user, db, meModel);
       },
     );
-
-    if (auth.currentUser != null) {
-      setUser(auth.currentUser, db, meModel);
-    }
   }
 
   void setUser(
@@ -78,7 +73,6 @@ class AuthModel extends ChangeNotifier {
   AuthUser? get user => _user;
 
   bool get reAuthed =>
-      _userCredential != null &&
       _authenticatedAt != null &&
       _authenticatedAt!.millisecondsSinceEpoch >=
           DateTime.now().millisecondsSinceEpoch - reAuthExpriedMilliSec;
@@ -106,13 +100,12 @@ class AuthModel extends ChangeNotifier {
     required String password,
     bool resetRecord = false,
   }) async {
-    _userCredential = await _auth.signInWithEmailAndPassword(
+    await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
     _authenticatedAt = DateTime.now();
     if (resetRecord) {
-      _userCredential = null;
       _authenticatedAt = null;
     }
   }
@@ -121,7 +114,7 @@ class AuthModel extends ChangeNotifier {
     required String email,
     required String deepLink,
   }) async {
-    _userCredential = await _auth.signInWithEmailLink(
+    await _auth.signInWithEmailLink(
       email: email,
       emailLink: deepLink,
     );
@@ -148,8 +141,7 @@ class AuthModel extends ChangeNotifier {
       email: _auth.currentUser!.email ?? '',
       password: password,
     );
-    _userCredential =
-        await _auth.currentUser!.reauthenticateWithCredential(credential);
+    await _auth.currentUser!.reauthenticateWithCredential(credential);
     _authenticatedAt = DateTime.now();
     notifyListeners();
   }
@@ -183,7 +175,6 @@ class AuthModel extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    _userCredential = null;
     _authenticatedAt = null;
     await _auth.signOut();
   }

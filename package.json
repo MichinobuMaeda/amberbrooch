@@ -6,11 +6,12 @@
   "author": "Michinobu Maeda <michinobumaeda@gmail.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "test:conf": "curl -X POST http://localhost:5001/amberbrooch/asia-northeast1/api/setup -H \"Content-Type: application/x-www-form-urlencoded\" -d \"name=Primary%20User&email=primary@example.com&password=password&url=http%3A%2F%2Flocalhost%3A5000%2F\"",
+    "test:setup": "curl -X POST http://localhost:5001/amberbrooch/asia-northeast1/api/setup -H \"Content-Type: application/x-www-form-urlencoded\" -d \"name=Primary%20User&email=primary@example.com&password=password&url=http%3A%2F%2Flocalhost%3A5000%2F\"",
+    "test:ci": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage 'yarn --cwd functions test && flutter test --coverage'",
     "test:functions": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage 'yarn --cwd functions test'",
-    "test:ui": "flutter test --coverage",
-    "test:genhtml": "genhtml coverage/lcov.info -o coverage/html",
-    "serve": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui 'yarn test:conf && flutter run -d chrome --web-port 5000 --dart-define=EMULATOR=Y'",
+    "test:ui": "flutter test --coverage && genhtml coverage/lcov.info -o coverage/html",
+    "serve": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui 'yarn test:setup && flutter run -d chrome --web-port 5000'",
+    "emulate": "yarn --cwd functions lint && yarn --cwd functions build && flutter build web && firebase emulators:start",
     "deploy": "firebase deploy"
   },
   "devDependencies": {

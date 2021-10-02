@@ -40,6 +40,7 @@ class HomeState extends State<HomePage> {
                                 child: SignInView(
                                   conf: confModel.conf,
                                   authModel: authModel,
+                                  firebaseModel: firebaseModel,
                                 ),
                               )
                             : authModel.user?.emailVerified == false
@@ -127,9 +128,9 @@ class HomeState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            const Visibility(
-                              visible: useEmulator,
-                              child: Text(
+                            Visibility(
+                              visible: firebaseModel.useEmulator,
+                              child: const Text(
                                 'エミュレータを使用しています。'
                                 '実世界のアカウントとデータを入力しないで下さい。'
                                 'この行は Production 環境では表示されません。',

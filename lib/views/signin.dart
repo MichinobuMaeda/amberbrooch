@@ -3,11 +3,13 @@ part of amberbrooch;
 class SignInView extends StatefulWidget {
   final Conf? conf;
   final AuthModel authModel;
+  final FirebaseModel firebaseModel;
 
   const SignInView({
     Key? key,
     this.conf,
     required this.authModel,
+    required this.firebaseModel,
   }) : super(key: key);
 
   @override
@@ -192,7 +194,7 @@ class SignInState extends State<SignInView> {
           ],
         ),
         Visibility(
-          visible: useEmulator,
+          visible: widget.firebaseModel.useEmulator,
           child: FlexRow(
             children: [
               TextButton(
