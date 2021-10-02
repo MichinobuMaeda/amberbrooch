@@ -3,18 +3,18 @@ part of amberbrooch;
 class MeModel extends ChangeNotifier {
   dynamic _sub;
   Account? _me;
-  late ThemeModeModel _themeModeModel;
+  late ClientModel _clientModel;
   late FirebaseFirestore _db;
 
   void listen(
     FirebaseFirestore db,
     AuthModel authModel,
-    ThemeModeModel themeModeModel,
+    ClientModel clientModel,
   ) {
     debugPrint('MeModel: listen()');
 
     _db = db;
-    _themeModeModel = themeModeModel;
+    _clientModel = clientModel;
     _sub?.cancel();
     if (authModel.user == null) {
       me = null;
@@ -48,7 +48,7 @@ class MeModel extends ChangeNotifier {
     if (_me != me) {
       _me = me;
       if (me != null) {
-        _themeModeModel.mode = me.themeMode;
+        _clientModel.themeMode = me.themeMode;
       }
       debugPrint('me: ${me?.id}');
       notifyListeners();

@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:amberbrooch/main.dart';
 
 void main() {
-  test('entities/ThemeModeModel: initialized with defaultThemeMode', () {
-    ThemeModeModel themeModeModel = ThemeModeModel();
-    expect(themeModeModel.mode, defaultThemeMode);
+  test('entities/clientModel: initialized with defaultThemeMode', () {
+    ClientModel clientModel = ClientModel();
+    expect(clientModel.themeMode, defaultThemeMode);
   });
-  test('entities/ThemeModeModel: can get/set mode.', () {
+  test('entities/clientModel: can get/set mode.', () {
     ThemeMode themeMode = ThemeMode.dark;
-    ThemeModeModel themeModeModel = ThemeModeModel();
-    themeModeModel.mode = themeMode;
-    expect(themeModeModel.mode, themeMode);
-    expect(themeModeModel.mode == defaultThemeMode, false);
+    ClientModel clientModel = ClientModel();
+    clientModel.themeMode = themeMode;
+    expect(clientModel.themeMode, themeMode);
+    expect(clientModel.themeMode == defaultThemeMode, false);
   });
 }

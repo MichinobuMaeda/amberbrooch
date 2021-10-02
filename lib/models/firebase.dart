@@ -13,7 +13,7 @@ class FirebaseModel extends ChangeNotifier {
     required AuthModel authModel,
     required ConfModel confModel,
     required MeModel meModel,
-    required ThemeModeModel themeModeModel,
+    required ClientModel clientModel,
   }) async {
     debugPrint('FirebaseModel: listen()');
     try {
@@ -38,7 +38,7 @@ class FirebaseModel extends ChangeNotifier {
 
     if (initialized) {
       auth.setLanguageCode('ja');
-      authModel.listen(auth, db, meModel, themeModeModel);
+      authModel.listen(auth, db, meModel, clientModel);
       confModel.listen(db, await PackageInfo.fromPlatform());
     }
   }

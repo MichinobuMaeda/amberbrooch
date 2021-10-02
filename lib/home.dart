@@ -6,17 +6,18 @@ class MainMenuItem {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final ClientModel clientModel;
+
+  const HomePage({
+    Key? key,
+    required this.clientModel,
+  }) : super(key: key);
 
   @override
   HomeState createState() => HomeState();
 }
 
-enum View { home, settings, policy }
-
 class HomeState extends State<HomePage> {
-  View _view = View.home;
-
   @override
   Widget build(BuildContext context) {
     return Consumer<FirebaseModel>(
@@ -27,8 +28,8 @@ class HomeState extends State<HomePage> {
               builder: (context, authModel, child) {
                 return Consumer<MeModel>(
                   builder: (context, meModel, child) {
-                    ThemeModeModel themeModeModel =
-                        Provider.of<ThemeModeModel>(context, listen: false);
+                    ClientModel clientModel =
+                        Provider.of<ClientModel>(context, listen: false);
 
                     Map<View, Widget> body = {
                       View.home: LoadingView(
@@ -53,7 +54,7 @@ class HomeState extends State<HomePage> {
                       ),
                       View.settings: ScrollView(
                         child: PreferencesView(
-                          themeModeModel: themeModeModel,
+                          clientModel: clientModel,
                           confModel: confModel,
                           authModel: authModel,
                           meModel: meModel,
@@ -71,7 +72,7 @@ class HomeState extends State<HomePage> {
                         condition ? colorActiveView : null;
 
                     return Scaffold(
-                      body: body[_view],
+                      body: body[widget.clientModel.view],
                       bottomNavigationBar: BottomAppBar(
                         child: Wrap(
                           alignment: WrapAlignment.spaceEvenly,
@@ -81,34 +82,34 @@ class HomeState extends State<HomePage> {
                             IconButton(
                               icon: Icon(
                                 Icons.home,
-                                color: colorActive(_view == View.home),
+                                color: colorActive(
+                                  widget.clientModel.view == View.home,
+                                ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _view = View.home;
-                                });
+                                widget.clientModel.view = View.home;
                               },
                             ),
                             IconButton(
                               icon: Icon(
                                 Icons.settings,
-                                color: colorActive(_view == View.settings),
+                                color: colorActive(
+                                  widget.clientModel.view == View.settings,
+                                ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _view = View.settings;
-                                });
+                                widget.clientModel.view = View.settings;
                               },
                             ),
                             IconButton(
                               icon: Icon(
                                 Icons.policy,
-                                color: colorActive(_view == View.policy),
+                                color: colorActive(
+                                  widget.clientModel.view == View.policy,
+                                ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _view = View.policy;
-                                });
+                                widget.clientModel.view = View.policy;
                               },
                             ),
                             Visibility(

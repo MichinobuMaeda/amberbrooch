@@ -5,11 +5,11 @@ class PreferencesView extends StatefulWidget {
   final MeModel meModel;
   final ConfModel confModel;
   final AuthModel authModel;
-  final ThemeModeModel themeModeModel;
+  final ClientModel clientModel;
 
   const PreferencesView({
     Key? key,
-    required this.themeModeModel,
+    required this.clientModel,
     required this.confModel,
     required this.authModel,
     required this.meModel,
@@ -76,14 +76,14 @@ class _PreferencesState extends State<PreferencesView> {
               ],
               onPressed: (int index) {
                 setState(() {
-                  widget.themeModeModel.mode = themeModes[index];
-                  widget.meModel.setThemeMode(widget.themeModeModel.mode);
+                  widget.clientModel.themeMode = themeModes[index];
+                  widget.meModel.setThemeMode(widget.clientModel.themeMode);
                 });
               },
               isSelected: [
-                widget.themeModeModel.mode == themeModes[0],
-                widget.themeModeModel.mode == themeModes[1],
-                widget.themeModeModel.mode == themeModes[2],
+                widget.clientModel.themeMode == themeModes[0],
+                widget.clientModel.themeMode == themeModes[1],
+                widget.clientModel.themeMode == themeModes[2],
               ],
             ),
           ],
@@ -410,6 +410,7 @@ class _PreferencesState extends State<PreferencesView> {
                 context: context,
                 message: 'ログアウトしますか？',
                 onPressed: () async {
+                  widget.clientModel.view = View.home;
                   await widget.authModel.signOut();
                 },
               ),

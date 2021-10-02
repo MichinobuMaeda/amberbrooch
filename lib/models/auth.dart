@@ -6,7 +6,7 @@ class AuthModel extends ChangeNotifier {
   UserCredential? _userCredential;
   DateTime? _authenticatedAt;
   late FirebaseAuth _auth;
-  late ThemeModeModel _themeModeModel;
+  late ClientModel _clientModel;
 
   AuthModel(this.deepLink);
 
@@ -14,12 +14,12 @@ class AuthModel extends ChangeNotifier {
     FirebaseAuth auth,
     FirebaseFirestore db,
     MeModel meModel,
-    ThemeModeModel themeModeModel,
+    ClientModel clientModel,
   ) {
     debugPrint('AuthModel: listen()');
 
     _auth = auth;
-    _themeModeModel = themeModeModel;
+    _clientModel = clientModel;
     String email = LocalStorage().email;
     LocalStorage().email = '';
 
@@ -52,7 +52,7 @@ class AuthModel extends ChangeNotifier {
       if (_user != null) {
         _user = null;
         debugPrint('AuthModel: null');
-        meModel.listen(db, this, _themeModeModel);
+        meModel.listen(db, this, _clientModel);
       }
     } else {
       AuthUser provided = AuthUser(
@@ -67,7 +67,7 @@ class AuthModel extends ChangeNotifier {
         _user = provided;
         debugPrint('AuthModel: ' + _user!.id);
         if (meModel.me?.id != _user!.id) {
-          meModel.listen(db, this, _themeModeModel);
+          meModel.listen(db, this, _clientModel);
         }
       }
     }

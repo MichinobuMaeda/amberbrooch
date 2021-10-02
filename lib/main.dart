@@ -22,7 +22,7 @@ part 'entities/conf.dart';
 part 'models/auth.dart';
 part 'models/firebase.dart';
 part 'models/me.dart';
-part 'models/theme_mode.dart';
+part 'models/client.dart';
 part 'models/conf.dart';
 part 'views/loading.dart';
 part 'views/policy.dart';
@@ -41,7 +41,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ThemeModeModel()),
+        ChangeNotifierProvider(create: (context) => ClientModel()),
         ChangeNotifierProvider(create: (context) => FirebaseModel()),
         ChangeNotifierProvider(create: (context) => AuthModel(deepLink)),
         ChangeNotifierProvider(create: (context) => ConfModel()),
@@ -72,11 +72,11 @@ class App extends StatelessWidget {
       authModel: Provider.of<AuthModel>(context, listen: false),
       confModel: Provider.of<ConfModel>(context, listen: false),
       meModel: Provider.of<MeModel>(context, listen: false),
-      themeModeModel: Provider.of<ThemeModeModel>(context, listen: false),
+      clientModel: Provider.of<ClientModel>(context, listen: false),
     );
 
-    return Consumer<ThemeModeModel>(
-      builder: (context, themeMode, child) {
+    return Consumer<ClientModel>(
+      builder: (context, clientModel, child) {
         return MaterialApp(
           title: appTitle,
           theme: ThemeData(
@@ -91,8 +91,8 @@ class App extends StatelessWidget {
             fontFamily: fontFamilySansSerif,
             textTheme: textTheme,
           ),
-          themeMode: themeMode.mode,
-          home: const HomePage(),
+          themeMode: clientModel.themeMode,
+          home: HomePage(clientModel: clientModel),
         );
       },
     );
