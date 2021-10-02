@@ -37,6 +37,10 @@ class AuthModel extends ChangeNotifier {
         setUser(user, db, meModel);
       },
     );
+
+    if (auth.currentUser != null) {
+      setUser(auth.currentUser, db, meModel);
+    }
   }
 
   void setUser(
