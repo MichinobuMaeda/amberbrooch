@@ -53,7 +53,6 @@ const createAccount = async (
       {uid, displayName, email: email} :
     {uid, displayName};
   await auth.createUser(profile);
-  logger.info(password);
 
   await db.collection("people").doc(uid).set({
     groups: group ? [group] : [],
