@@ -61,13 +61,15 @@ class AuthModel extends ChangeNotifier {
         emailVerified: user.emailVerified,
       );
       if (_user != provided) {
-        if (_user?.emailVerified != true && provided.emailVerified) {
-          notifyListeners();
-        }
+        final bool emailVerified =
+            _user?.emailVerified != true && provided.emailVerified;
         _user = provided;
         debugPrint('AuthModel: ' + _user!.id);
         if (meModel.me?.id != _user!.id) {
           meModel.listen(db, this, _clientModel);
+        }
+        if (emailVerified) {
+          notifyListeners();
         }
       }
     }
