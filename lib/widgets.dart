@@ -324,3 +324,24 @@ class PageTitle extends Widget {
     ).createElement();
   }
 }
+
+class SectionTitle extends Widget {
+  final String title;
+  final IconData iconData;
+
+  const SectionTitle({
+    Key? key,
+    required this.title,
+    required this.iconData,
+  }) : super(key: key);
+
+  @override
+  Element createElement() {
+    return FlexRow(
+      children: [
+        Icon(iconData, size: fontSizeH3 * 1.4),
+        Text(title, style: const TextStyle(fontSize: fontSizeH3)),
+      ],
+    ).createElement();
+  }
+}

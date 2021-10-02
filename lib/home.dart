@@ -52,7 +52,7 @@ class HomeState extends State<HomePage> {
                                     child: TopView(),
                                   ),
                       ),
-                      View.settings: ScrollView(
+                      View.preferences: ScrollView(
                         child: PreferencesView(
                           clientModel: clientModel,
                           confModel: confModel,
@@ -94,11 +94,11 @@ class HomeState extends State<HomePage> {
                               icon: Icon(
                                 Icons.settings,
                                 color: colorActive(
-                                  widget.clientModel.view == View.settings,
+                                  widget.clientModel.view == View.preferences,
                                 ),
                               ),
                               onPressed: () {
-                                widget.clientModel.view = View.settings;
+                                widget.clientModel.view = View.preferences;
                               },
                             ),
                             IconButton(

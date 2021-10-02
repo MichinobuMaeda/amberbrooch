@@ -3,6 +3,7 @@ library amberbrooch;
 import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,10 +39,11 @@ part 'widgets.dart';
 
 void main() {
   String deepLink = html.window.location.href;
+  LocalStore localStore = WebClientLocalStore();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ClientModel()),
+        ChangeNotifierProvider(create: (context) => ClientModel(localStore)),
         ChangeNotifierProvider(create: (context) => FirebaseModel()),
         ChangeNotifierProvider(create: (context) => AuthModel(deepLink)),
         ChangeNotifierProvider(create: (context) => ConfModel()),

@@ -20,8 +20,8 @@ class AuthModel extends ChangeNotifier {
 
     _auth = auth;
     _clientModel = clientModel;
-    String email = LocalStorage().email;
-    LocalStorage().email = '';
+    String email = _clientModel.email;
+    _clientModel.email = '';
 
     debugPrint(deepLink);
     debugPrint(email);
@@ -92,7 +92,7 @@ class AuthModel extends ChangeNotifier {
         handleCodeInApp: true,
       ),
     );
-    LocalStorage().email = email;
+    _clientModel.email = email;
   }
 
   Future<void> sendEmailVerification() async {
@@ -138,7 +138,7 @@ class AuthModel extends ChangeNotifier {
         handleCodeInApp: true,
       ),
     );
-    LocalStorage().email = email;
+    _clientModel.email = email;
   }
 
   Future<void> reauthenticateWithPassword(String password) async {

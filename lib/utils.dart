@@ -6,32 +6,19 @@ void realoadApp() {
   html.window.location.reload();
 }
 
-class LocalStorage {
-  final _keyEmail = 'amberbrooch_email';
-  final _keyPageName = 'amberbrooch_page_name';
-  final _keyPageId = 'amberbrooch_page_id';
+abstract class LocalStore {
+  void setValue(String key, String value);
+  String getValue(String key);
+}
 
-  set email(String value) {
-    _setValue(_keyEmail, value);
+class WebClientLocalStore extends LocalStore {
+  @override
+  String getValue(String key) {
+    return html.window.localStorage[key] ?? '';
   }
 
-  String get email => _getValue(_keyEmail);
-
-  set pageName(String value) {
-    _setValue(_keyPageName, value);
-  }
-
-  String get pageName => _getValue(_keyPageName);
-
-  set pageId(String value) {
-    _setValue(_keyPageId, value);
-  }
-
-  String get pageId => _getValue(_keyPageId);
-
-  _setValue(String key, String value) {
+  @override
+  void setValue(String key, String value) {
     html.window.localStorage[key] = value;
   }
-
-  String _getValue(String key) => html.window.localStorage[key] ?? '';
 }
