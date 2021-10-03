@@ -49,9 +49,7 @@ class HomeState extends State<HomePage> {
                                       authModel: authModel,
                                     ),
                                   )
-                                : const ScrollView(
-                                    child: TopView(),
-                                  ),
+                                : const TopView(),
                       ),
                       View.preferences: ScrollView(
                         child: PreferencesView(

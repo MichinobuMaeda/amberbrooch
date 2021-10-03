@@ -204,6 +204,333 @@ class RadioList<T> extends Widget {
   }
 }
 
+class DataCell extends Widget {
+  final double height;
+  final double width;
+  final Widget child;
+  final Color? color;
+
+  const DataCell({
+    Key? key,
+    required this.height,
+    required this.width,
+    required this.child,
+    this.color,
+  }) : super(key: key);
+
+  @override
+  Element createElement() {
+    return Container(
+      color: color,
+      height: height,
+      width: width,
+      decoration: const BoxDecoration(
+        border: Border(
+          right: BorderSide(color: Colors.blueGrey, width: 1.0),
+          bottom: BorderSide(color: Colors.blueGrey, width: 1.0),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: fontSizeBody / 4,
+          horizontal: fontSizeBody / 4,
+        ),
+        child: child,
+      ),
+    ).createElement();
+  }
+}
+
+class DataSheet extends Widget {
+  final double height;
+  final double width;
+  final double fixedHeight;
+  final double fixedWidth;
+  final Widget origin;
+  final Widget colTitles;
+  final Widget rowTitles;
+  final Widget data;
+  final ScrollController _titleScrollController = ScrollController();
+  final ScrollController _dataScrollController = ScrollController();
+
+  DataSheet({
+    Key? key,
+    required this.height,
+    required this.width,
+    required this.fixedHeight,
+    required this.fixedWidth,
+    required this.origin,
+    required this.colTitles,
+    required this.rowTitles,
+    required this.data,
+  }) : super(key: key);
+
+  @override
+  Element createElement() {
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.topLeft,
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.blueGrey, width: 1.0),
+          left: BorderSide(color: Colors.blueGrey, width: 1.0),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              origin,
+              SizedBox(
+                width: width - fixedWidth - 1.0,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    _dataScrollController.jumpTo(_titleScrollController.offset);
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    controller: _titleScrollController,
+                    child: colTitles,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: height - fixedHeight - 1.0,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: fontSizeBody * 4,
+                    child: rowTitles,
+                  ),
+                  SizedBox(
+                    width: width - fixedWidth - 1.0,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        _titleScrollController
+                            .jumpTo(_dataScrollController.offset);
+                        return false;
+                      },
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _dataScrollController,
+                        child: data,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).createElement();
+  }
+}
+
+DataCell origin = const DataCell(
+  height: fontSizeBody * 4,
+  width: fontSizeBody * 4,
+  child: Text(''),
+);
+
+Row colTitles = Row(
+  children: dataCols
+      .map<Widget>(
+        (value) => value == 'D'
+            ? Column(
+                children: [
+                  DataCell(
+                    height: fontSizeBody * 2,
+                    width: fontSizeBody * 7,
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Row(
+                    children: const [
+                      DataCell(
+                        height: fontSizeBody * 2,
+                        width: fontSizeBody * 3.5,
+                        child: Text(
+                          'x',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      DataCell(
+                        height: fontSizeBody * 2,
+                        width: fontSizeBody * 3.5,
+                        child: Text(
+                          'y',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            : DataCell(
+                height: fontSizeBody * 4,
+                width: fontSizeBody * 4,
+                child: Text(
+                  value,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+      )
+      .toList(),
+);
+
+Column rowTitles = Column(
+  children: dataRows
+      .map<Widget>(
+        (value) => DataCell(
+          height: fontSizeBody * (value == '5' ? 4 : 2),
+          width: fontSizeBody * 4,
+          child: Text(
+            value,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      )
+      .toList(),
+);
+
+Column data = Column(
+  children: dataRows
+      .map<Widget>(
+        (value1) => Row(
+          children: dataCols
+              .map<Widget>(
+                (value2) => value2 == 'D'
+                    ? Row(
+                        children: [
+                          DataCell(
+                            height: fontSizeBody * (value1 == '5' ? 4 : 2),
+                            width: fontSizeBody * 3.5,
+                            child: Text(
+                              value2 + value1 + 'x',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          DataCell(
+                            height: fontSizeBody * (value1 == '5' ? 4 : 2),
+                            width: fontSizeBody * 3.5,
+                            child: Text(
+                              value2 + value1 + 'y',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      )
+                    : (value1 == '5' && value2 == 'B')
+                        ? const DataCell(
+                            height: fontSizeBody * 4,
+                            width: fontSizeBody * 4,
+                            child: Icon(Icons.comment, size: fontSizeBody * 2),
+                          )
+                        : DataCell(
+                            height: fontSizeBody * (value1 == '5' ? 4 : 2),
+                            width: fontSizeBody * 4,
+                            child: Text(
+                              value2 + value1,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+              )
+              .toList(),
+        ),
+      )
+      .toList(),
+);
+
+List<String> dataCols = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+];
+List<String> dataRows = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+  '29',
+  '30',
+  '31',
+  '32',
+  '33',
+  '34',
+  '35',
+  '36',
+  '37',
+  '38',
+  '39',
+  '40',
+  '41',
+  '42',
+  '43',
+  '44',
+  '45',
+  '46',
+  '47',
+  '48',
+  '49',
+  '50',
+];
+
 void showConfirmationDialog({
   required BuildContext context,
   String title = '操作の確認',
