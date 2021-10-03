@@ -36,7 +36,7 @@ describe("updateVersion()", () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.0",
-        buildNumber: "1",
+        build_number: "1",
       },
     });
     await confRef.delete();
@@ -44,11 +44,11 @@ describe("updateVersion()", () => {
     expect(ret).toBeFalsy();
   });
   it("returns true and not modifies conf" +
-      " has same version and buildNumber.", async () => {
+      " has same version and build_number.", async () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.0",
-        buildNumber: "1",
+        build_number: "1",
       },
     });
     const ret = await updateVersion(firebase);
@@ -60,7 +60,7 @@ describe("updateVersion()", () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.1",
-        buildNumber: "1",
+        build_number: "1",
       },
     });
     const ret = await updateVersion(firebase);
@@ -70,11 +70,11 @@ describe("updateVersion()", () => {
     expect(conf.get("version")).toEqual("1.0.1");
     expect(conf.get("buildNumber")).toEqual("1");
   });
-  it("returns true and update conf has old buildNumber.", async () => {
+  it("returns true and update conf has old build_number.", async () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         version: "1.0.0",
-        buildNumber: "2",
+        build_number: "2",
       },
     });
     const ret = await updateVersion(firebase);
