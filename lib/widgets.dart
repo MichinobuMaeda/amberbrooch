@@ -252,6 +252,7 @@ class DataSheet extends Widget {
   final Widget data;
   final ScrollController _titleScrollController = ScrollController();
   final ScrollController _dataScrollController = ScrollController();
+  // final ScrollController _holizontalScrollController = ScrollController();
 
   DataSheet({
     Key? key,
@@ -267,68 +268,126 @@ class DataSheet extends Widget {
 
   @override
   Element createElement() {
-    return Container(
-      width: width,
-      height: height,
-      alignment: Alignment.topLeft,
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.blueGrey, width: 1.0),
-          left: BorderSide(color: Colors.blueGrey, width: 1.0),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              origin,
-              SizedBox(
-                width: width - fixedWidth - 1.0,
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    _dataScrollController.jumpTo(_titleScrollController.offset);
-                    return false;
-                  },
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: _titleScrollController,
-                    child: colTitles,
-                  ),
-                ),
-              ),
-            ],
+    return Column(
+      children: [
+        Container(
+          width: width,
+          height: height - fontSizeBody * 2,
+          alignment: Alignment.topLeft,
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.blueGrey, width: 1.0),
+              left: BorderSide(color: Colors.blueGrey, width: 1.0),
+            ),
           ),
-          SizedBox(
-            height: height - fixedHeight - 1.0,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Row(
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  SizedBox(
-                    width: fontSizeBody * 4,
-                    child: rowTitles,
-                  ),
+                  origin,
                   SizedBox(
                     width: width - fixedWidth - 1.0,
                     child: NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification scrollInfo) {
-                        _titleScrollController
-                            .jumpTo(_dataScrollController.offset);
-                        return false;
+                        _dataScrollController
+                            .jumpTo(_titleScrollController.offset);
+                        return true;
                       },
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        controller: _dataScrollController,
-                        child: data,
+                        controller: _titleScrollController,
+                        child: colTitles,
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
+              SizedBox(
+                height: height - fixedHeight - fontSizeBody * 2 - 1.0,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: fontSizeBody * 4,
+                        child: rowTitles,
+                      ),
+                      SizedBox(
+                        width: width - fixedWidth - 1.0,
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollInfo) {
+                            _titleScrollController
+                                .jumpTo(_dataScrollController.offset);
+                            return true;
+                          },
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _dataScrollController,
+                            child: data,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.first_page),
+              onPressed: () {
+                _dataScrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 10),
+                  curve: Curves.ease,
+                );
+              },
+            ),
+            const Spacer(flex: 1),
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_left),
+              onPressed: () {
+                _dataScrollController.animateTo(
+                  max(
+                      0,
+                      _dataScrollController.position.pixels -
+                          (width - fixedWidth) / 4),
+                  duration: const Duration(milliseconds: 10),
+                  curve: Curves.ease,
+                );
+              },
+            ),
+            const Spacer(flex: 4),
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_right),
+              onPressed: () {
+                _dataScrollController.animateTo(
+                  min(
+                      _dataScrollController.position.pixels +
+                          (width - fixedWidth) / 4,
+                      _dataScrollController.position.maxScrollExtent),
+                  duration: const Duration(milliseconds: 10),
+                  curve: Curves.ease,
+                );
+              },
+            ),
+            const Spacer(flex: 1),
+            IconButton(
+              icon: const Icon(Icons.last_page),
+              onPressed: () {
+                _dataScrollController.animateTo(
+                  _dataScrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 10),
+                  curve: Curves.ease,
+                );
+              },
+            ),
+          ],
+        ),
+      ],
     ).createElement();
   }
 }
