@@ -121,7 +121,7 @@ class HomeState extends State<HomePage> {
                                   iconData: Icons.system_update,
                                   label: 'アプリを更新してください',
                                   onPressed: () {
-                                    realoadApp();
+                                    realoadApp(Navigator.of(context));
                                   },
                                 ),
                               ),
