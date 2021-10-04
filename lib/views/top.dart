@@ -54,15 +54,18 @@ class TopState extends State<TopView> {
                 vertical: fontSizeBody,
                 horizontal: fontSizeBody,
               ),
-              child: DataSheet(
-                height: constraints.maxHeight - 96.0 - fontSizeBody * 2,
-                width: constraints.maxWidth - fontSizeBody * 2,
-                fixedHeight: fontSizeBody * 4,
-                fixedWidth: fontSizeBody * 4,
-                origin: origin,
-                colTitles: colTitles,
-                rowTitles: rowTitles,
-                data: data,
+              child: SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight - 128.0,
+                child: StickyHeadersTable(
+                  columnsLength: dataCols.length,
+                  rowsLength: dataRows.length,
+                  columnsTitleBuilder: (i) => Text(dataCols[i]),
+                  rowsTitleBuilder: (i) => Text(dataRows[i]),
+                  contentCellBuilder: (i, j) =>
+                      Text('${dataCols[i]}${dataRows[j]}'),
+                  legendCell: const Text(''),
+                ),
               ),
             ),
           ],
