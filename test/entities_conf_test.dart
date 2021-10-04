@@ -8,7 +8,6 @@ void main() {
     Conf conf = Conf(
       id: 'id01',
       version: 'v1.1.0',
-      buildNumber: '1',
       url: 'url01',
       policy: 'policy01',
       createdAt: DateTime.fromMillisecondsSinceEpoch(msec + 1),
@@ -17,7 +16,6 @@ void main() {
 
     expect(conf.id, 'id01');
     expect(conf.version, 'v1.1.0');
-    expect(conf.buildNumber, '1');
     expect(conf.url, 'url01');
     expect(conf.policy, 'policy01');
     expect(conf.createdAt, DateTime.fromMillisecondsSinceEpoch(msec + 1));
@@ -28,7 +26,6 @@ void main() {
     final db = FakeFirebaseFirestore();
     await db.collection('service').doc('conf').set({
       'version': 'v1.1.0',
-      'buildNumber': '1',
       'url': 'url01',
       'policy': 'policy01',
       'createdAt': DateTime.fromMillisecondsSinceEpoch(msec + 1),
@@ -40,7 +37,6 @@ void main() {
 
     expect(conf.id, 'conf');
     expect(conf.version, 'v1.1.0');
-    expect(conf.buildNumber, '1');
     expect(conf.url, 'url01');
     expect(conf.policy, 'policy01');
     expect(conf.createdAt, DateTime.fromMillisecondsSinceEpoch(msec + 1));
@@ -51,7 +47,6 @@ void main() {
     Conf conf01 = Conf(
       id: 'id01',
       version: 'v1.1.0',
-      buildNumber: '1',
       url: 'url01',
       policy: 'policy01',
       createdAt: DateTime.fromMillisecondsSinceEpoch(msec + 1),
@@ -60,7 +55,6 @@ void main() {
     Conf conf02 = Conf(
       id: 'id01',
       version: 'v1.1.0',
-      buildNumber: '1',
       url: 'url01',
       policy: 'policy01',
       createdAt: DateTime.fromMillisecondsSinceEpoch(msec + 1),

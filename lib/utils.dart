@@ -2,10 +2,6 @@ part of amberbrooch;
 
 Function deepCollectionEquality = const DeepCollectionEquality().equals;
 
-void realoadApp(NavigatorState navState) {
-  navState.pushNamedAndRemoveUntil('/', (route) => false);
-}
-
 abstract class LocalStore {
   void setValue(String key, String value);
   String getValue(String key);

@@ -15,8 +15,7 @@ const ts = new Date("2020-01-01T00:00:00.000Z");
 
 beforeEach(async () => {
   await confRef.set({
-    version: "1.0.0",
-    buildNumber: "1",
+    version: "1.0.0+1",
     url: "http://example.com/version.json",
     createdAt: ts,
     updatedAt: ts,
@@ -66,9 +65,8 @@ describe("updateVersion()", () => {
     const ret = await updateVersion(firebase);
     expect(ret).toBeTruthy();
     const conf = await confRef.get();
+    expect(conf.get("version")).toEqual("1.0.1+1");
     expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(conf.get("version")).toEqual("1.0.1");
-    expect(conf.get("buildNumber")).toEqual("1");
   });
   it("returns true and update conf has old build_number.", async () => {
     mockedAxios.get.mockResolvedValue({
@@ -81,8 +79,7 @@ describe("updateVersion()", () => {
     expect(ret).toBeTruthy();
     const conf = await confRef.get();
     expect(conf.get("updatedAt").toDate()).not.toEqual(ts);
-    expect(conf.get("version")).toEqual("1.0.0");
-    expect(conf.get("buildNumber")).toEqual("2");
+    expect(conf.get("version")).toEqual("1.0.0+2");
   });
 });
 

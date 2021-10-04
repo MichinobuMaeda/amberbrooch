@@ -13,7 +13,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import "package:universal_html/html.dart" as html;
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'config/version.dart';
 
 part 'config/firebase.dart';
 part 'config/theme.dart';
@@ -21,11 +21,8 @@ part 'entities/account.dart';
 part 'entities/auth_user.dart';
 part 'entities/base.dart';
 part 'entities/conf.dart';
-part 'models/auth.dart';
-part 'models/firebase.dart';
-part 'models/me.dart';
-part 'models/client.dart';
-part 'models/conf.dart';
+part 'service_mode.dart';
+part 'client_model.dart';
 part 'views/loading.dart';
 part 'views/policy.dart';
 part 'views/preferences.dart';
@@ -33,7 +30,6 @@ part 'views/scroll_view.dart';
 part 'views/signin.dart';
 part 'views/top.dart';
 part 'views/verify_email.dart';
-part 'home.dart';
 part 'utils.dart';
 part 'validators.dart';
 part 'widgets.dart';
@@ -47,10 +43,12 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ClientModel(localStore)),
-        ChangeNotifierProvider(create: (context) => FirebaseModel(useEmulator)),
-        ChangeNotifierProvider(create: (context) => AuthModel(deepLink)),
-        ChangeNotifierProvider(create: (context) => ConfModel()),
-        ChangeNotifierProvider(create: (context) => MeModel()),
+        ChangeNotifierProvider(
+          create: (context) => ServiceModel(
+            useEmulator: useEmulator,
+            deepLink: deepLink,
+          ),
+        ),
       ],
       child: const App(),
     ),
@@ -68,14 +66,11 @@ class App extends StatelessWidget {
     final FirebaseFunctions functions =
         FirebaseFunctions.instanceFor(region: functionsRegion);
 
-    Provider.of<FirebaseModel>(context, listen: false).listen(
+    Provider.of<ServiceModel>(context, listen: false).listen(
       auth: auth,
       db: db,
       storage: storage,
       functions: functions,
-      authModel: Provider.of<AuthModel>(context, listen: false),
-      confModel: Provider.of<ConfModel>(context, listen: false),
-      meModel: Provider.of<MeModel>(context, listen: false),
       clientModel: Provider.of<ClientModel>(context, listen: false),
     );
 
@@ -96,7 +91,157 @@ class App extends StatelessWidget {
             textTheme: textTheme,
           ),
           themeMode: clientModel.themeMode,
-          home: HomePage(clientModel: clientModel),
+          initialRoute: '/',
+          onGenerateRoute: (RouteSettings settings) {
+            AppRoute route = AppRoute.fromSettings(settings);
+            debugPrint('route: ${route.name}:${route.id}');
+            return MaterialPageRoute(
+              builder: (context) {
+                return AppScreen(
+                  key: ValueKey('${route.name}:${route.id}'),
+                  clientModel: clientModel,
+                  route: route,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class AppRoute {
+  final String name;
+  final String id;
+
+  AppRoute({
+    required this.name,
+    required this.id,
+  });
+  AppRoute.fromSettings(RouteSettings settings)
+      : name = settings.name ?? AppRoute.home().name,
+        id = (settings.arguments as RouteArguments?)?.id ?? '';
+  AppRoute.home()
+      : name = '/',
+        id = '';
+  AppRoute.policy()
+      : name = '/policy',
+        id = '';
+  AppRoute.preferences({
+    this.id = '0',
+  }) : name = '/preferences';
+}
+
+class RouteArguments {
+  final String id;
+  RouteArguments({required this.id});
+}
+
+class AppScreen extends StatefulWidget {
+  final ClientModel clientModel;
+  final AppRoute route;
+
+  const AppScreen({
+    Key? key,
+    required this.clientModel,
+    required this.route,
+  }) : super(key: key);
+
+  @override
+  AppState createState() => AppState();
+}
+
+class AppState extends State<AppScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ServiceModel>(
+      builder: (context, service, child) {
+        ClientModel clientModel =
+            Provider.of<ClientModel>(context, listen: false);
+        if (service.me != null &&
+            service.user?.emailVerified == true &&
+            widget.route.name == AppRoute.home().name) {
+          clientModel.restoreRoute(context: context);
+        }
+
+        Map<String, Widget> routes = {
+          AppRoute.home().name: LoadingView(
+            service: service,
+            child: service.me == null
+                ? ScrollView(
+                    child: SignInView(
+                      conf: service.conf,
+                      clientModel: clientModel,
+                      service: service,
+                    ),
+                  )
+                : service.user?.emailVerified == false
+                    ? ScrollView(
+                        child: VerifyEmailView(
+                          service: service,
+                        ),
+                      )
+                    : const TopView(),
+          ),
+          AppRoute.preferences().name: ScrollView(
+            child: PreferencesView(
+              clientModel: clientModel,
+              service: service,
+              routeId: widget.route.id,
+            ),
+          ),
+          AppRoute.policy().name: ScrollView(
+            child: PolicyView(
+              service: service,
+            ),
+          ),
+        };
+
+        return Scaffold(
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(40.0),
+            child: AppBar(
+              title: const Text(appTitle),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: widget.route.name == AppRoute.preferences().name
+                      ? null
+                      : () {
+                          clientModel.goRoute(
+                            context,
+                            AppRoute.preferences(),
+                          );
+                        },
+                )
+              ],
+            ),
+          ),
+          body: Stack(
+            children: [
+              routes[widget.route.name]!,
+              Visibility(
+                visible: version != service.conf?.version,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: fontSizeBody * 2,
+                      horizontal: fontSizeBody / 2,
+                    ),
+                    child: DangerButton(
+                      iconData: Icons.system_update,
+                      label: 'アプリを更新してください',
+                      onPressed: () {
+                        widget.clientModel.realoadApp();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

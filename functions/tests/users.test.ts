@@ -21,7 +21,6 @@ beforeEach(async () => {
     seed,
     invitationExpirationTime,
     version: "1.0.0",
-    buildNumber: "1",
     createdAt: ts,
     updatedAt: ts,
   });

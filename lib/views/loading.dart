@@ -1,32 +1,30 @@
 part of amberbrooch;
 
 class LoadingView extends StatelessWidget {
-  final FirebaseModel firebaseModel;
-  final ConfModel confModel;
+  final ServiceModel service;
   final Widget child;
 
   const LoadingView({
     Key? key,
-    required this.firebaseModel,
-    required this.confModel,
+    required this.service,
     required this.child,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => firebaseModel.error
-      ? const Center(
+  Widget build(BuildContext context) => service.error
+      ? Center(
           child: Text(
-            'システムに接続できませんでした。',
-            style: TextStyle(
+            service.initialized ? 'システムの情報を取得できませんでした。' : 'システムに接続できませんでした。',
+            style: const TextStyle(
               fontSize: fontSizeH4,
               color: colorDanger,
             ),
           ),
         )
-      : !firebaseModel.initialized
+      : service.conf == null
           ? Column(
-              children: const [
-                LinearProgressIndicator(
+              children: [
+                const LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Colors.deepOrangeAccent,
                   ),
@@ -35,8 +33,10 @@ class LoadingView extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: Text(
-                      'システムに接続しています。',
-                      style: TextStyle(
+                      service.initialized
+                          ? 'システムの情報を取得しています。'
+                          : 'システムに接続しています。',
+                      style: const TextStyle(
                         fontSize: fontSizeH4,
                       ),
                     ),
@@ -44,36 +44,5 @@ class LoadingView extends StatelessWidget {
                 ),
               ],
             )
-          : confModel.error
-              ? const Center(
-                  child: Text(
-                    'システムの情報を取得できませんでした。',
-                    style: TextStyle(
-                      fontSize: fontSizeH4,
-                      color: colorDanger,
-                    ),
-                  ),
-                )
-              : !confModel.initialized
-                  ? Column(
-                      children: const [
-                        LinearProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.deepOrangeAccent,
-                          ),
-                          minHeight: fontSizeBody / 2,
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              'システムの情報を取得しています。',
-                              style: TextStyle(
-                                fontSize: fontSizeH4,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : child;
+          : child;
 }

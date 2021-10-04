@@ -1,11 +1,11 @@
 part of amberbrooch;
 
 class VerifyEmailView extends StatefulWidget {
-  final AuthModel authModel;
+  final ServiceModel service;
 
   const VerifyEmailView({
     Key? key,
-    required this.authModel,
+    required this.service,
   }) : super(key: key);
 
   @override
@@ -24,8 +24,7 @@ class VerifyEmailState extends State<VerifyEmailView> {
 
   @override
   Widget build(BuildContext context) {
-    AuthModel authModel = Provider.of<AuthModel>(context, listen: false);
-    AuthUser? authUser = authModel.user;
+    AuthUser? authUser = widget.service.user;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,11 +47,11 @@ class VerifyEmailState extends State<VerifyEmailView> {
               label: '送信',
               onPressed: () async {
                 try {
-                  await widget.authModel.sendEmailVerification();
+                  await widget.service.sendEmailVerification();
                   _timer = Timer.periodic(
                     const Duration(seconds: 1),
                     (timer) async {
-                      await authModel.reload();
+                      await widget.service.reloadAuthUser();
                     },
                   );
                   showNotificationSnackBar(
@@ -90,7 +89,7 @@ class VerifyEmailState extends State<VerifyEmailView> {
               iconData: Icons.logout,
               label: 'ログアウト',
               onPressed: () async {
-                await widget.authModel.signOut();
+                await widget.service.signOut(context: context);
               },
             ),
           ],

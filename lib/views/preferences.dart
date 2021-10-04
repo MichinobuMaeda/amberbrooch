@@ -2,17 +2,15 @@ part of amberbrooch;
 
 @visibleForTesting
 class PreferencesView extends StatefulWidget {
-  final MeModel meModel;
-  final ConfModel confModel;
-  final AuthModel authModel;
+  final ServiceModel service;
   final ClientModel clientModel;
+  final String routeId;
 
   const PreferencesView({
     Key? key,
     required this.clientModel,
-    required this.confModel,
-    required this.authModel,
-    required this.meModel,
+    required this.service,
+    this.routeId = '0',
   }) : super(key: key);
 
   @override
@@ -49,6 +47,13 @@ class _PreferencesState extends State<PreferencesView> {
     ThemeMode.dark,
     ThemeMode.system,
   ];
+  late String _routeId;
+
+  @override
+  void initState() {
+    super.initState();
+    _routeId = widget.routeId;
+  }
 
   @override
   void dispose() {
@@ -62,7 +67,7 @@ class _PreferencesState extends State<PreferencesView> {
 
   @override
   Widget build(BuildContext context) {
-    Account? me = widget.meModel.me;
+    Account? me = widget.service.me;
     _nameController.text = me?.name ?? '';
 
     List<PreferencesPanel> panels = [
@@ -96,13 +101,19 @@ class _PreferencesState extends State<PreferencesView> {
         ),
         ExpansionPanelList(
           expansionCallback: (int index, bool isExpanded) {
-            widget.clientModel.panel = isExpanded ? -1 : index;
+            setState(() {
+              _routeId = isExpanded ? '' : '$index';
+            });
+            // widget.clientModel.setRoute(
+            //   name: routeNamePreferences,
+            //   id: _routeId,
+            // );
           },
           children: List.generate(
             panels.length,
             (index) => buildExpansionPanel(
               context: context,
-              isExpanded: widget.clientModel.panel == index,
+              isExpanded: _routeId == '$index',
               title: panels[index].title,
               children: panels[index].builder(index),
             ),
@@ -110,41 +121,48 @@ class _PreferencesState extends State<PreferencesView> {
         ),
         const SizedBox(height: fontSizeBody),
         FlexRow(
-          visible: me != null,
           children: [
-            DangerButton(
-              iconData: Icons.logout,
-              label: 'ログアウト',
-              onPressed: () => showConfirmationDialog(
-                context: context,
-                message: 'ログアウトしますか？',
-                onPressed: () async {
-                  widget.clientModel.view = View.home;
-                  await widget.authModel.signOut();
-                },
+            Visibility(
+              visible: me != null,
+              child: DangerButton(
+                iconData: Icons.logout,
+                label: 'ログアウト',
+                onPressed: () => showConfirmationDialog(
+                  context: context,
+                  message: 'ログアウトしますか？',
+                  onPressed: () async {
+                    await widget.service.signOut(context: context);
+                  },
+                ),
               ),
             ),
-          ],
-        ),
-        FlexRow(
-          children: [
-            TextButton(
-              child: const Text('Copyright'),
-              onPressed: () => showAboutDialog(
-                useRootNavigator: false,
-                context: context,
-                applicationIcon: const Image(
-                  image: AssetImage('images/logo.png'),
-                  width: fontSizeBody * 3,
-                  height: fontSizeBody * 3,
+            FlexRow(
+              children: [
+                TextButton(
+                  child: const Text('プライバシー・ポリシー'),
+                  onPressed: () {
+                    widget.clientModel.goRoute(context, AppRoute.policy());
+                  },
                 ),
-                applicationName: appTitle,
-                applicationVersion: widget.confModel.version,
-                children: [
-                  const Text(copyRight),
-                  const Text(licenseNotice),
-                ],
-              ),
+                TextButton(
+                  child: const Text('Copyright'),
+                  onPressed: () => showAboutDialog(
+                    useRootNavigator: false,
+                    context: context,
+                    applicationIcon: const Image(
+                      image: AssetImage('images/logo.png'),
+                      width: fontSizeBody * 3,
+                      height: fontSizeBody * 3,
+                    ),
+                    applicationName: appTitle,
+                    applicationVersion: version,
+                    children: [
+                      const Text(copyRight),
+                      const Text(licenseNotice),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -190,7 +208,7 @@ class _PreferencesState extends State<PreferencesView> {
         onPressed: (int index) {
           setState(() {
             widget.clientModel.themeMode = themeModes[index];
-            widget.meModel.setThemeMode(widget.clientModel.themeMode);
+            widget.service.setMyThemeMode(widget.clientModel.themeMode);
           });
         },
         isSelected: [
@@ -203,8 +221,8 @@ class _PreferencesState extends State<PreferencesView> {
   }
 
   List<Widget> buildDisplayName(int index) {
-    Account? me = widget.meModel.me;
-    _nameController.text = widget.meModel.me?.name ?? '';
+    Account? me = widget.service.me;
+    _nameController.text = widget.service.me?.name ?? '';
     return [
       Form(
         key: _nameFormKey,
@@ -242,7 +260,7 @@ class _PreferencesState extends State<PreferencesView> {
                           message: '表示名は変更されていません。',
                         );
                       } else {
-                        await widget.meModel.setName(_nameController.text);
+                        await widget.service.setMyName(_nameController.text);
                         showNotificationSnackBar(
                           context: context,
                           message: '表示名を保存しました。',
@@ -267,7 +285,7 @@ class _PreferencesState extends State<PreferencesView> {
   List<Widget> buildSignInMethods(int index) {
     return [
       FlexRow(
-        visible: !widget.authModel.reAuthed,
+        visible: !widget.service.reAuthed,
         children: const [
           Text('メールアドレスとパスワードの変更には、現在のメールアドレスか、'
               'または、現在のパスワードの確認が必要です。'),
@@ -275,7 +293,7 @@ class _PreferencesState extends State<PreferencesView> {
       ),
       FlexRow(
         alignment: WrapAlignment.end,
-        visible: !widget.authModel.reAuthed,
+        visible: !widget.service.reAuthed,
         children: [
           const SizedBox(
             width: maxContentBodyWidth / 2,
@@ -284,15 +302,13 @@ class _PreferencesState extends State<PreferencesView> {
           SendMailButton(
             onPressed: () async {
               try {
-                Conf conf =
-                    Provider.of<ConfModel>(context, listen: false).conf!;
-                await widget.authModel
-                    .reauthenticateWithEmailLink(url: conf.url);
-                widget.clientModel.routeName = 'preferences';
-                widget.clientModel.routeItem = '$index';
+                Conf conf = widget.service.conf!;
+                await widget.service.reauthenticateWithEmailLink(url: conf.url);
+                widget.clientModel
+                    .storeRoute(AppRoute.preferences(id: '$index'));
                 showNotificationSnackBar(
                   context: context,
-                  message: '確認のためのメールを ${widget.authModel.user?.email} に送信しました。'
+                  message: '確認のためのメールを ${widget.service.user?.email} に送信しました。'
                       '受信したメールの確認のためのリンクをクリックしてください。',
                 );
               } catch (e) {
@@ -307,7 +323,7 @@ class _PreferencesState extends State<PreferencesView> {
         ],
       ),
       Visibility(
-        visible: widget.authModel.reAuthed,
+        visible: widget.service.reAuthed,
         child: Form(
           key: _emailFormKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -363,7 +379,7 @@ class _PreferencesState extends State<PreferencesView> {
                             );
                           } else {
                             try {
-                              await widget.authModel.setMyEmail(email);
+                              await widget.service.setMyEmail(email);
                               showNotificationSnackBar(
                                 context: context,
                                 durationMilliSec: 10 * 1000,
@@ -393,7 +409,7 @@ class _PreferencesState extends State<PreferencesView> {
         child: Wrap(
           children: [
             FlexRow(
-              visible: widget.authModel.reAuthed,
+              visible: widget.service.reAuthed,
               children: [
                 SizedBox(
                   width: maxContentBodyWidth / 2,
@@ -436,7 +452,7 @@ class _PreferencesState extends State<PreferencesView> {
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     decoration: InputDecoration(
                       label: Text(
-                        widget.authModel.reAuthed ? 'パスワードの確認' : '現在のパスワード',
+                        widget.service.reAuthed ? 'パスワードの確認' : '現在のパスワード',
                       ),
                       suffixIcon: VisibilityIconButton(
                         visible: _passwordVisible,
@@ -447,7 +463,7 @@ class _PreferencesState extends State<PreferencesView> {
                         },
                       ),
                     ),
-                    validator: (String? value) => widget.authModel.reAuthed
+                    validator: (String? value) => widget.service.reAuthed
                         ? (_passwordController.text == _password2Controller.text
                             ? null
                             : 'パスワードが一致しません。')
@@ -458,7 +474,7 @@ class _PreferencesState extends State<PreferencesView> {
                   padding: const EdgeInsets.only(top: fontSizeBody),
                   child: FlexRow(
                     children: [
-                      widget.authModel.reAuthed
+                      widget.service.reAuthed
                           ? SaveButton(
                               onPressed: () async {
                                 String password = _passwordController.text;
@@ -470,7 +486,7 @@ class _PreferencesState extends State<PreferencesView> {
                                   );
                                 } else {
                                   try {
-                                    await widget.authModel
+                                    await widget.service
                                         .setMyPassword(password);
                                     showNotificationSnackBar(
                                       context: context,
@@ -492,7 +508,7 @@ class _PreferencesState extends State<PreferencesView> {
                           : SendButton(
                               onPressed: () async {
                                 try {
-                                  await widget.authModel
+                                  await widget.service
                                       .reauthenticateWithPassword(
                                           _password2Controller.text);
                                   setState(() {

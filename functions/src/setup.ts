@@ -16,18 +16,13 @@ const updateVersion = async (firebase: app.App): Promise<boolean> => {
   const res = await axios.get(
       `${conf.get("url")}version.json?check=${new Date().getTime()}`
   );
-  const version = res.data.version;
-  const buildNumber = res.data.build_number;
+  const version = `${res.data.version}+${res.data.build_number}`;
 
-  if (
-    (version !== conf.get("version")) ||
-    (buildNumber !== conf.get("buildNumber"))
-  ) {
-    logger.info(`${version}+${buildNumber}`);
+  if (version !== conf.get("version")) {
+    logger.info(version);
 
     await db.collection("service").doc("conf").update({
       version,
-      buildNumber,
       updatedAt: new Date(),
     });
   }
@@ -114,8 +109,7 @@ const install = async (
   const seed = hash.digest("hex");
 
   await db.collection("service").doc("conf").set({
-    version: "1.0.0",
-    buildNumber: "1",
+    version: "1.0.0+0",
     url,
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,

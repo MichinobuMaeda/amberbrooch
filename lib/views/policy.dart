@@ -1,13 +1,11 @@
 part of amberbrooch;
 
 class PolicyView extends StatefulWidget {
-  final ConfModel confModel;
-  final Account? me;
+  final ServiceModel service;
 
   const PolicyView({
     Key? key,
-    required this.confModel,
-    this.me,
+    required this.service,
   }) : super(key: key);
 
   @override
@@ -41,7 +39,7 @@ class PolicyState extends State<PolicyView> {
 
   @override
   Widget build(BuildContext context) {
-    Conf? conf = widget.confModel.conf;
+    Conf? conf = widget.service.conf;
     _policyController.text = conf?.policy ?? '';
 
     return Column(
@@ -52,7 +50,7 @@ class PolicyState extends State<PolicyView> {
           title: 'プライバシー・ポリシー',
         ),
         Visibility(
-          visible: widget.me?.admin == true && !_editMode,
+          visible: widget.service.me?.admin == true && !_editMode,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -69,12 +67,12 @@ class PolicyState extends State<PolicyView> {
         ),
         FlexRow(
           alignment: WrapAlignment.end,
-          visible: widget.me?.admin == true && _editMode,
+          visible: widget.service.me?.admin == true && _editMode,
           children: [
             SaveButton(
               onPressed: () async {
                 _editMode = false;
-                await widget.confModel.setPolicy(_policyController.text);
+                await widget.service.setPolicy(_policyController.text);
               },
             ),
             CancelButton(
@@ -95,7 +93,7 @@ class PolicyState extends State<PolicyView> {
           ],
         ),
         Visibility(
-          visible: widget.me?.admin != true || !_editMode,
+          visible: widget.service.me?.admin != true || !_editMode,
           child: MarkdownBody(
             key: _keyMarkdown,
             selectable: true,

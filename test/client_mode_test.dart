@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:amberbrooch/main.dart';
 
 void main() {
-  test('entities/clientModel: initialized with defaultThemeMode', () {
+  test('ClientModel: initialized with defaultThemeMode', () {
     ClientModel clientModel = ClientModel(WebClientLocalStore());
     expect(clientModel.themeMode, defaultThemeMode);
   });
-  test('entities/clientModel: can get/set mode.', () {
+  test('ClientModel: can get/set mode.', () {
     ThemeMode themeMode = ThemeMode.dark;
     ClientModel clientModel = ClientModel(WebClientLocalStore());
     clientModel.themeMode = themeMode;

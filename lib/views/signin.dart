@@ -2,14 +2,14 @@ part of amberbrooch;
 
 class SignInView extends StatefulWidget {
   final Conf? conf;
-  final AuthModel authModel;
-  final FirebaseModel firebaseModel;
+  final ClientModel clientModel;
+  final ServiceModel service;
 
   const SignInView({
     Key? key,
     this.conf,
-    required this.authModel,
-    required this.firebaseModel,
+    required this.clientModel,
+    required this.service,
   }) : super(key: key);
 
   @override
@@ -47,6 +47,15 @@ class SignInState extends State<SignInView> {
         const PageTitle(
           iconData: Icons.login,
           title: 'ログイン',
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            child: const Text('プライバシー・ポリシー'),
+            onPressed: () {
+              widget.clientModel.goRoute(context, AppRoute.policy());
+            },
+          ),
         ),
         FlexRow(
           children: [
@@ -102,7 +111,7 @@ class SignInState extends State<SignInView> {
                           );
                         } else {
                           try {
-                            await widget.authModel.sendSignInLinkToEmail(
+                            await widget.service.sendSignInLinkToEmail(
                               email: email,
                               url: conf!.url,
                             );
@@ -166,7 +175,7 @@ class SignInState extends State<SignInView> {
                         );
                       } else {
                         try {
-                          await widget.authModel.signInWithEmailAndPassword(
+                          await widget.service.signInWithEmailAndPassword(
                             email: email,
                             password: password,
                           );
@@ -194,13 +203,13 @@ class SignInState extends State<SignInView> {
           ],
         ),
         Visibility(
-          visible: widget.firebaseModel.useEmulator,
+          visible: widget.service.useEmulator,
           child: FlexRow(
             children: [
               TextButton(
                 child: const Text('Test'),
                 onPressed: () async {
-                  await widget.authModel.signInWithEmailAndPassword(
+                  await widget.service.signInWithEmailAndPassword(
                     email: testEmail,
                     password: testPassword,
                     resetRecord: true,

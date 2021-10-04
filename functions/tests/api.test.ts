@@ -30,7 +30,6 @@ describe("get: /setup", () => {
   it("send text 'OK' if document 'conf' is exists.", async () => {
     await confRef.set({
       version: "1.0.0",
-      buildNumber: "1",
       createdAt: ts,
       updatedAt: ts,
     });
@@ -160,7 +159,6 @@ describe("post: /setup", () => {
   it("send status 406 if document 'conf' is exists.", async () => {
     await confRef.set({
       version: "1.0.0",
-      buildNumber: "1",
       createdAt: ts,
       updatedAt: ts,
     });
