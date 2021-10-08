@@ -2,13 +2,11 @@ part of amberbrooch;
 
 @visibleForTesting
 class AccountsView extends StatefulWidget {
-  final String routeId;
   final ServiceModel service;
   final ClientModel clientModel;
 
   const AccountsView({
     Key? key,
-    required this.routeId,
     required this.clientModel,
     required this.service,
   }) : super(key: key);
@@ -22,7 +20,7 @@ class _AccountsState extends State<AccountsView> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [],
+      children: const [],
     );
   }
 }

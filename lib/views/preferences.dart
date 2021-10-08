@@ -59,7 +59,6 @@ class _PreferencesState extends State<PreferencesView> {
         title: '表示モード',
         child: ThemeModeView(
           key: ValueKey(panelKey(PreferencesPanels.themeMode)),
-          routeId: describeEnum(PreferencesPanels.themeMode),
           clientModel: widget.clientModel,
           service: widget.service,
         ),
@@ -70,7 +69,6 @@ class _PreferencesState extends State<PreferencesView> {
           title: '表示名',
           child: DisplayNameView(
             key: ValueKey(panelKey(PreferencesPanels.displayName)),
-            routeId: describeEnum(PreferencesPanels.displayName),
             clientModel: widget.clientModel,
             service: widget.service,
           ),
@@ -81,9 +79,11 @@ class _PreferencesState extends State<PreferencesView> {
           title: 'ログイン方法',
           child: SigninMethodsView(
             key: ValueKey(panelKey(PreferencesPanels.signinMethods)),
-            routeId: describeEnum(PreferencesPanels.signinMethods),
             clientModel: widget.clientModel,
             service: widget.service,
+            route: AppRoute.preferences(
+              id: describeEnum(PreferencesPanels.signinMethods),
+            ),
           ),
         ),
       if (me?.admin == true)
@@ -92,7 +92,6 @@ class _PreferencesState extends State<PreferencesView> {
           title: 'アカウント管理',
           child: AccountsView(
             key: ValueKey(panelKey(PreferencesPanels.accounts)),
-            routeId: describeEnum(PreferencesPanels.accounts),
             clientModel: widget.clientModel,
             service: widget.service,
           ),

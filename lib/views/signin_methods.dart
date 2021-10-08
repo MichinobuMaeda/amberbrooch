@@ -2,15 +2,15 @@ part of amberbrooch;
 
 @visibleForTesting
 class SigninMethodsView extends StatefulWidget {
-  final String routeId;
   final ServiceModel service;
   final ClientModel clientModel;
+  final AppRoute route;
 
   const SigninMethodsView({
     Key? key,
-    required this.routeId,
     required this.clientModel,
     required this.service,
+    required this.route,
   }) : super(key: key);
 
   @override
@@ -65,8 +65,7 @@ class _SigninMethodsState extends State<SigninMethodsView> {
                   Conf conf = widget.service.conf!;
                   await widget.service
                       .reauthenticateWithEmailLink(url: conf.url);
-                  widget.clientModel
-                      .storeRoute(AppRoute.preferences(id: widget.routeId));
+                  widget.clientModel.storeRoute(widget.route);
                   showNotificationSnackBar(
                     context: context,
                     message: '確認のためのメールを ${widget.service.user?.email} に送信しました。'

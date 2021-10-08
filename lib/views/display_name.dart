@@ -2,13 +2,11 @@ part of amberbrooch;
 
 @visibleForTesting
 class DisplayNameView extends StatefulWidget {
-  final String routeId;
   final ServiceModel service;
   final ClientModel clientModel;
 
   const DisplayNameView({
     Key? key,
-    required this.routeId,
     required this.clientModel,
     required this.service,
   }) : super(key: key);
