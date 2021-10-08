@@ -14,7 +14,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 import "package:universal_html/html.dart" as html;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:table_sticky_headers/table_sticky_headers.dart';
 
 part 'config/firebase.dart';
 part 'config/theme.dart';
