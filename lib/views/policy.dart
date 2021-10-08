@@ -87,7 +87,6 @@ class PolicyState extends State<PolicyView> {
               controller: _policyController,
               focusNode: _policyFocusNode,
               maxLines: 10,
-              autofocus: true,
               style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             ),
           ],

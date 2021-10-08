@@ -94,7 +94,6 @@ class SignInState extends State<SignInView> {
                             ? null
                             : '正しい書式のメールアドレスを記入してください。')
                         : 'メールアドレスを記入してください。',
-                    autofocus: true,
                   ),
                 ),
                 Visibility(

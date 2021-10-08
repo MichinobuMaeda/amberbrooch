@@ -16,14 +16,14 @@ class RadioList<T> extends Widget {
   Element createElement() {
     return Wrap(
       children: options.keys
-          .map((key) => ListTile(
-                title: Text(options[key] ?? ''),
-                leading: Radio<T>(
-                  value: key,
-                  groupValue: groupValue,
-                  onChanged: onChanged,
-                ),
-              ))
+          .map(
+            (key) => RadioListTile(
+              title: Text(options[key] ?? ''),
+              value: key,
+              groupValue: groupValue,
+              onChanged: onChanged,
+            ),
+          )
           .toList(),
     ).createElement();
   }

@@ -240,7 +240,6 @@ class _PreferencesState extends State<PreferencesView> {
                 ),
                 validator: (String? value) =>
                     validateRequired(value) ? null : '必ず記入してください',
-                autofocus: true,
               ),
             ),
             Padding(
