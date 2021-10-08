@@ -49,7 +49,7 @@ class ClientModel extends ChangeNotifier {
 
   void storeRoute(AppRoute appRoute) {
     localStore.setValue(_keyPageName, appRoute.name);
-    localStore.setValue(_keyPageId, appRoute.id);
+    localStore.setValue(_keyPageId, appRoute.id ?? '');
   }
 
   void restoreRoute({required BuildContext context}) {
@@ -61,7 +61,7 @@ class ClientModel extends ChangeNotifier {
     storeRoute(AppRoute.home());
     Timer(
       const Duration(milliseconds: 500),
-      () => goRoute(context, AppRoute(name: name, id: id)),
+      () => goRoute(context, AppRoute(name: name, id: id == '' ? null : id)),
     );
   }
 

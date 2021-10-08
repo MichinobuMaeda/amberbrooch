@@ -2,6 +2,7 @@ library amberbrooch;
 
 import 'dart:async';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -23,14 +24,19 @@ part 'entities/base.dart';
 part 'entities/conf.dart';
 part 'service_model.dart';
 part 'client_model.dart';
+part 'views/accounts.dart';
+part 'views/display_name.dart';
 part 'views/loading.dart';
 part 'views/policy.dart';
 part 'views/preferences.dart';
 part 'views/scroll_view.dart';
 part 'views/signin.dart';
+part 'views/signin_methods.dart';
+part 'views/theme_mode.dart';
 part 'views/top.dart';
 part 'views/verify_email.dart';
 part 'widgets/buttons.dart';
+part 'widgets/fixedtitlesview.dart';
 part 'widgets/interactions.dart';
 part 'widgets/layout.dart';
 part 'widgets/selects.dart';
@@ -115,29 +121,29 @@ class App extends StatelessWidget {
 
 class AppRoute {
   final String name;
-  final String id;
+  final String? id;
 
   AppRoute({
     required this.name,
-    required this.id,
+    this.id,
   });
   AppRoute.fromSettings(RouteSettings settings)
       : name = settings.name ?? AppRoute.home().name,
-        id = (settings.arguments as RouteArguments?)?.id ?? '';
+        id = (settings.arguments as RouteArguments?)?.id;
   AppRoute.home()
       : name = '/',
-        id = '';
+        id = null;
   AppRoute.policy()
       : name = '/policy',
-        id = '';
+        id = null;
   AppRoute.preferences({
-    this.id = '0',
+    this.id,
   }) : name = '/preferences';
 }
 
 class RouteArguments {
-  final String id;
-  RouteArguments({required this.id});
+  final String? id;
+  RouteArguments({this.id});
 }
 
 class AppScreen extends StatefulWidget {
