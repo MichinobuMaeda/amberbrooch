@@ -10,9 +10,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import "package:universal_html/html.dart" as html;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'config/version.dart';
+
+import "package:universal_html/html.dart" as html;
 
 part 'config/firebase.dart';
 part 'config/theme.dart';
@@ -20,7 +21,7 @@ part 'entities/account.dart';
 part 'entities/auth_user.dart';
 part 'entities/base.dart';
 part 'entities/conf.dart';
-part 'service_mode.dart';
+part 'service_model.dart';
 part 'client_model.dart';
 part 'views/loading.dart';
 part 'views/policy.dart';
@@ -29,9 +30,11 @@ part 'views/scroll_view.dart';
 part 'views/signin.dart';
 part 'views/top.dart';
 part 'views/verify_email.dart';
-part 'utils.dart';
+part 'widgets/buttons.dart';
+part 'widgets/interactions.dart';
+part 'widgets/layout.dart';
+part 'widgets/selects.dart';
 part 'validators.dart';
-part 'widgets.dart';
 
 void main() {
   String deepLink = html.window.location.href;

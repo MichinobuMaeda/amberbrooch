@@ -1,5 +1,7 @@
 part of amberbrooch;
 
+Function deepCollectionEquality = const DeepCollectionEquality().equals;
+
 abstract class BaseEntity {
   final String id;
   final DateTime createdAt;
