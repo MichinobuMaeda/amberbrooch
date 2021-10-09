@@ -2,6 +2,8 @@ part of amberbrooch;
 
 const String functionsRegion = 'asia-northeast1';
 const int reAuthExpriedMilliSec = 30 * 60 * 1000;
+
+// Test
 const String testEmail = 'primary@example.com';
 const String testPassword = 'password';
 const int emulatorPortAuth = 9099;

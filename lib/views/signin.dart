@@ -1,11 +1,11 @@
 part of amberbrooch;
 
-class SignInView extends StatefulWidget {
+class SigninView extends StatefulWidget {
   final Conf? conf;
   final ClientModel clientModel;
   final ServiceModel service;
 
-  const SignInView({
+  const SigninView({
     Key? key,
     this.conf,
     required this.clientModel,
@@ -13,14 +13,13 @@ class SignInView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  SignInState createState() => SignInState();
+  _SigninViewState createState() => _SigninViewState();
 }
 
-enum SignInMethods { emailLink, emailPasrowd }
+enum SigninMethods { emailLink, emailPasrowd }
 
-@visibleForTesting
-class SignInState extends State<SignInView> {
-  SignInMethods _signInMethods = SignInMethods.emailLink;
+class _SigninViewState extends State<SigninView> {
+  SigninMethods _signInMethods = SigninMethods.emailLink;
   final GlobalKey<FormState> _formEmailKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController(
     text: '',
@@ -53,22 +52,22 @@ class SignInState extends State<SignInView> {
           child: TextButton(
             child: const Text('プライバシー・ポリシー'),
             onPressed: () {
-              widget.clientModel.goRoute(context, AppRoute.policy());
+              widget.clientModel.goRoute(AppRoute.policy());
             },
           ),
         ),
         FlexRow(
           children: [
             const Text('ログイン方法を選択してください。'),
-            RadioList<SignInMethods>(
+            RadioList<SigninMethods>(
               options: const {
-                SignInMethods.emailLink: 'メールでログイン用のリンクを受け取る。',
-                SignInMethods.emailPasrowd: 'メールアドレスとパスワードでログインする。',
+                SigninMethods.emailLink: 'メールでログイン用のリンクを受け取る。',
+                SigninMethods.emailPasrowd: 'メールアドレスとパスワードでログインする。',
               },
               groupValue: _signInMethods,
-              onChanged: (SignInMethods? value) {
+              onChanged: (SigninMethods? value) {
                 setState(() {
-                  _signInMethods = value ?? SignInMethods.emailLink;
+                  _signInMethods = value ?? SigninMethods.emailLink;
                 });
               },
             ),
@@ -97,7 +96,7 @@ class SignInState extends State<SignInView> {
                   ),
                 ),
                 Visibility(
-                  visible: _signInMethods == SignInMethods.emailLink,
+                  visible: _signInMethods == SigninMethods.emailLink,
                   child: Padding(
                     padding: const EdgeInsets.only(top: fontSizeBody),
                     child: SendMailButton(
@@ -136,7 +135,7 @@ class SignInState extends State<SignInView> {
             ),
             FlexRow(
               alignment: WrapAlignment.end,
-              visible: _signInMethods == SignInMethods.emailPasrowd,
+              visible: _signInMethods == SigninMethods.emailPasrowd,
               children: [
                 SizedBox(
                   width: maxContentBodyWidth / 2,

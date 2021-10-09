@@ -1,6 +1,5 @@
 part of amberbrooch;
 
-@visibleForTesting
 class DisplayNameView extends StatefulWidget {
   final ServiceModel service;
   final ClientModel clientModel;

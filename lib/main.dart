@@ -22,13 +22,11 @@ part 'entities/account.dart';
 part 'entities/auth_user.dart';
 part 'entities/base.dart';
 part 'entities/conf.dart';
-part 'service_model.dart';
-part 'client_model.dart';
 part 'views/accounts.dart';
 part 'views/display_name.dart';
-part 'views/loading.dart';
-part 'views/policy.dart';
-part 'views/preferences.dart';
+part 'screens/home.dart';
+part 'screens/policy.dart';
+part 'screens/preferences.dart';
 part 'views/scroll_view.dart';
 part 'views/signin.dart';
 part 'views/signin_methods.dart';
@@ -40,6 +38,10 @@ part 'widgets/fixedtitlesview.dart';
 part 'widgets/interactions.dart';
 part 'widgets/layout.dart';
 part 'widgets/selects.dart';
+part 'screens/base.dart';
+part 'client_model.dart';
+part 'router.dart';
+part 'service_model.dart';
 part 'validators.dart';
 
 void main() {
@@ -63,28 +65,36 @@ void main() {
   );
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  final AppRouterDelegate _routerDelegate = AppRouterDelegate();
+  final AppRouteInformationParser _routeInformationParser =
+      AppRouteInformationParser();
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<ServiceModel>(context, listen: false).listen(
+      auth: FirebaseAuth.instance,
+      db: FirebaseFirestore.instance,
+      storage: FirebaseStorage.instance,
+      functions: FirebaseFunctions.instanceFor(region: functionsRegion),
+      clientModel: Provider.of<ClientModel>(context, listen: false),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final FirebaseFirestore db = FirebaseFirestore.instance;
-    final FirebaseStorage storage = FirebaseStorage.instance;
-    final FirebaseFunctions functions =
-        FirebaseFunctions.instanceFor(region: functionsRegion);
-
-    Provider.of<ServiceModel>(context, listen: false).listen(
-      auth: auth,
-      db: db,
-      storage: storage,
-      functions: functions,
-      clientModel: Provider.of<ClientModel>(context, listen: false),
-    );
-
     return Consumer<ClientModel>(
       builder: (context, clientModel, child) {
-        return MaterialApp(
+        _routerDelegate.clientModel = clientModel;
+
+        return MaterialApp.router(
           title: appTitle,
           theme: ThemeData(
             brightness: Brightness.light,
@@ -99,157 +109,8 @@ class App extends StatelessWidget {
             textTheme: textTheme,
           ),
           themeMode: clientModel.themeMode,
-          initialRoute: '/',
-          onGenerateRoute: (RouteSettings settings) {
-            AppRoute route = AppRoute.fromSettings(settings);
-            debugPrint('route: ${route.name}:${route.id}');
-            return MaterialPageRoute(
-              builder: (context) {
-                return AppScreen(
-                  key: ValueKey('${route.name}:${route.id}'),
-                  clientModel: clientModel,
-                  route: route,
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class AppRoute {
-  final String name;
-  final String? id;
-
-  AppRoute({
-    required this.name,
-    this.id,
-  });
-  AppRoute.fromSettings(RouteSettings settings)
-      : name = settings.name ?? AppRoute.home().name,
-        id = (settings.arguments as RouteArguments?)?.id;
-  AppRoute.home()
-      : name = '/',
-        id = null;
-  AppRoute.policy()
-      : name = '/policy',
-        id = null;
-  AppRoute.preferences({
-    this.id,
-  }) : name = '/preferences';
-}
-
-class RouteArguments {
-  final String? id;
-  RouteArguments({this.id});
-}
-
-class AppScreen extends StatefulWidget {
-  final ClientModel clientModel;
-  final AppRoute route;
-
-  const AppScreen({
-    Key? key,
-    required this.clientModel,
-    required this.route,
-  }) : super(key: key);
-
-  @override
-  AppState createState() => AppState();
-}
-
-class AppState extends State<AppScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ServiceModel>(
-      builder: (context, service, child) {
-        ClientModel clientModel =
-            Provider.of<ClientModel>(context, listen: false);
-        if (service.me != null &&
-            service.user?.emailVerified == true &&
-            widget.route.name == AppRoute.home().name) {
-          clientModel.restoreRoute(context: context);
-        }
-
-        Map<String, Widget> routes = {
-          AppRoute.home().name: LoadingView(
-            service: service,
-            child: service.me == null
-                ? ScrollView(
-                    child: SignInView(
-                      conf: service.conf,
-                      clientModel: clientModel,
-                      service: service,
-                    ),
-                  )
-                : service.user?.emailVerified == false
-                    ? ScrollView(
-                        child: VerifyEmailView(
-                          service: service,
-                        ),
-                      )
-                    : const TopView(),
-          ),
-          AppRoute.preferences().name: ScrollView(
-            child: PreferencesView(
-              clientModel: clientModel,
-              service: service,
-              routeId: widget.route.id,
-            ),
-          ),
-          AppRoute.policy().name: ScrollView(
-            child: PolicyView(
-              service: service,
-            ),
-          ),
-        };
-
-        return Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(40.0),
-            child: AppBar(
-              title: const Text(appTitle),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: widget.route.name == AppRoute.preferences().name
-                      ? null
-                      : () {
-                          clientModel.goRoute(
-                            context,
-                            AppRoute.preferences(),
-                          );
-                        },
-                )
-              ],
-            ),
-          ),
-          body: Stack(
-            children: [
-              routes[widget.route.name]!,
-              Visibility(
-                visible: version != service.conf?.version,
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: fontSizeBody * 2,
-                      horizontal: fontSizeBody / 2,
-                    ),
-                    child: DangerButton(
-                      iconData: Icons.system_update,
-                      label: 'アプリを更新してください',
-                      onPressed: () {
-                        widget.clientModel.realoadApp();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          routerDelegate: _routerDelegate,
+          routeInformationParser: _routeInformationParser,
         );
       },
     );

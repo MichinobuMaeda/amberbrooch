@@ -1,6 +1,5 @@
 part of amberbrooch;
 
-@visibleForTesting
 class AccountsView extends StatefulWidget {
   final ServiceModel service;
   final ClientModel clientModel;

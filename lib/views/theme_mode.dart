@@ -12,10 +12,10 @@ class ThemeModeView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ThemeModeState createState() => _ThemeModeState();
+  _ThemeModeViewState createState() => _ThemeModeViewState();
 }
 
-class _ThemeModeState extends State<ThemeModeView> {
+class _ThemeModeViewState extends State<ThemeModeView> {
   @override
   Widget build(BuildContext context) {
     return Column(

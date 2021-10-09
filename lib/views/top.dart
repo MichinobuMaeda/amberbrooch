@@ -10,11 +10,10 @@ class TopView extends StatefulWidget {
   const TopView({Key? key}) : super(key: key);
 
   @override
-  TopState createState() => TopState();
+  _TopViewState createState() => _TopViewState();
 }
 
-@visibleForTesting
-class TopState extends State<TopView> {
+class _TopViewState extends State<TopView> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(

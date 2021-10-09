@@ -9,11 +9,10 @@ class VerifyEmailView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  VerifyEmailState createState() => VerifyEmailState();
+  _VerifyEmailViewState createState() => _VerifyEmailViewState();
 }
 
-@visibleForTesting
-class VerifyEmailState extends State<VerifyEmailView> {
+class _VerifyEmailViewState extends State<VerifyEmailView> {
   Timer? _timer;
 
   @override
