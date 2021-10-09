@@ -11,7 +11,7 @@
     "test:functions": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage 'yarn --cwd functions test'",
     "test:ui": "flutter test --coverage && genhtml coverage/lcov.info -o coverage/html",
     "serve": "yarn --cwd functions lint && yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui 'yarn test:setup && flutter run -d chrome --web-port 5000'",
-    "emulate": "yarn --cwd functions lint && yarn --cwd functions build && flutter build web && firebase emulators:start",
+    "emulate": "yarn --cwd functions lint && yarn --cwd functions build && flutter build web --web-renderer html --release && firebase emulators:start",
     "deploy": "firebase deploy"
   },
   "devDependencies": {

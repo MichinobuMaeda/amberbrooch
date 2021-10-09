@@ -51,7 +51,7 @@ jobs:
       - run: flutter pub get
       - run: yarn test:ci
       - run: grep "^version:" pubspec.yaml | sed 's/^version:\s*\(.*\)\s*$/const version="\1";/g' > lib/config/version.dart
-      - run: flutter build web
+      - run: flutter build web --web-renderer html --release
       - run: yarn deploy --only storage,firestore --token "${{ secrets.FIREBASE_TOKEN_AMBERBROOCH }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
