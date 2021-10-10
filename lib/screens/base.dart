@@ -40,7 +40,7 @@ Scaffold scaffoldApp({
       children: [
         child,
         Visibility(
-          visible: version != service.conf?.version,
+          visible: service.conf != null && version != service.conf?.version,
           child: Align(
             alignment: Alignment.topRight,
             child: Padding(
@@ -55,6 +55,19 @@ Scaffold scaffoldApp({
                   clientModel.realoadApp();
                 },
               ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: service.conf == null,
+          child: const Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: fontSizeBody * 2,
+                horizontal: fontSizeBody / 2,
+              ),
+              child: Text(version),
             ),
           ),
         ),
