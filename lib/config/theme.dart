@@ -13,8 +13,8 @@ const Color colorSecondary = Colors.blueGrey;
 const Color colorDanger = Colors.redAccent;
 const Color colorActiveView = Colors.orangeAccent;
 
-const fontFamilySansSerif = 'NotoSansJP';
-const fontFamilyMonoSpace = 'RobotoMono';
+const fontFamilySansSerif = null; // 'NotoSansJP';
+const fontFamilyMonoSpace = null; // 'RobotoMono';
 
 const double maxContentBodyWidth = 960.0;
 const double fontSizeBody = 16.0;
