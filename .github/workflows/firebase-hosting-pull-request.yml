@@ -6,7 +6,7 @@ name: Test and deploy to Firebase Hosting on PR
       - 'functions/**'
       - '.github/workflows/firebase-functions-*.yml'
 env:
-  flutter_version: "2.5.2"
+  flutter_version: "2.5.3"
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
