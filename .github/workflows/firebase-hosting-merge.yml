@@ -47,10 +47,11 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: ${{ env.flutter_version }}
-      - run: rm web/index.html && mv web/index_prod.html web/index.html
       - run: flutter pub get
       - run: yarn test:ci
+      - run: rm web/index.html && mv web/index_prod.html web/index.html
       - run: grep "^version:" pubspec.yaml | sed 's/^version:\s*\(.*\)\s*$/const version="\1";/g' > lib/config/version.dart
+      - run: SERVICEWORKERVERSION=`grep "^version:" pubspec.yaml | sed "s/^version:\s*\(.*\)\s*$/var serviceWorkerVersion = '\1';/g"`; sed "s/var\ serviceWorkerVersion\ =\ null;/$SERVICEWORKERVERSION/g" -i web/index.html
       - run: flutter build web --web-renderer html --release
       - run: yarn deploy --only storage,firestore --token "${{ secrets.FIREBASE_TOKEN_AMBERBROOCH }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
